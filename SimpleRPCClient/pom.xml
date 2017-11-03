@@ -12,4 +12,11 @@
     <artifactId>net.sea.simple.rpc.client</artifactId>
 
 
+    <dependencies>
+    	<dependency>
+    		<groupId>net.sea.simple.rpc</groupId>
+    		<artifactId>net.sea.simpl.rpc.commons</artifactId>
+    		<version>1.0-SNAPSHOT</version>
+    	</dependency>
+    </dependencies>
 </project>
