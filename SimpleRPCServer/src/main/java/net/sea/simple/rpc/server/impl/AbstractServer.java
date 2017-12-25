@@ -15,6 +15,14 @@ public abstract class AbstractServer implements IRPCServer {
 		return start(parseConfig());
 	}
 
+	@Override
+	public boolean start(ServerConfig config) {
+		// TODO Auto-generated method stub
+		// 启动服务
+		// 注册服务
+		return false;
+	}
+
 	/**
 	 * 解析配置文件
 	 * 
@@ -25,4 +33,18 @@ public abstract class AbstractServer implements IRPCServer {
 		return new ServerConfig();
 	}
 
+	/**
+	 * 启动心跳检测服务
+	 * 
+	 * @param config
+	 */
+	protected void startHeartbeat(ServerConfig config) {
+		new Thread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+			}
+		}).start();
+	}
 }
