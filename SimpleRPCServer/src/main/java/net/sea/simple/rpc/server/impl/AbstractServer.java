@@ -1,5 +1,7 @@
 package net.sea.simple.rpc.server.impl;
 
+import net.sea.simpl.rpc.register.ServiceRegister;
+import net.sea.simpl.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.server.IRPCServer;
 import net.sea.simple.rpc.server.config.ServerConfig;
 
@@ -10,6 +12,8 @@ import net.sea.simple.rpc.server.config.ServerConfig;
  *
  */
 public abstract class AbstractServer implements IRPCServer {
+	protected ServiceRegister serviceRegister;
+
 	@Override
 	public boolean start() {
 		return start(parseConfig());
@@ -20,8 +24,17 @@ public abstract class AbstractServer implements IRPCServer {
 		// TODO Auto-generated method stub
 		// 启动服务
 		// 注册服务
+		serviceRegister.register(createServiceInfo(config));
 		return false;
 	}
+
+	/**
+	 * 创建服务信息对象
+	 * 
+	 * @param config
+	 * @return
+	 */
+	protected abstract ServiceInfo createServiceInfo(ServerConfig config);
 
 	/**
 	 * 解析配置文件
