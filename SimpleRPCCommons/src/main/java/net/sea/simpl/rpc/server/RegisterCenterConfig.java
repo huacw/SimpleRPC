@@ -7,31 +7,9 @@ package net.sea.simpl.rpc.server;
  *
  */
 public class RegisterCenterConfig {
-	/**
-	 * 服务选择策略
-	 * 
-	 * @author sea
-	 *
-	 */
-	public enum ServiceChoiceStrategy {
-		polling("轮询"), random("随机"), weight("负载比重");
-		private String desc;
-
-		private ServiceChoiceStrategy(String desc) {
-			this.desc = desc;
-		}
-
-		public String getDesc() {
-			return desc;
-		}
-
-		public void setDesc(String desc) {
-			this.desc = desc;
-		}
-	}
-
 	private String zkServers;// zk服务器地址
-	private int timeout = 10000;// 超时时间
+	private int sessionTimeout = 100;// 会话超时时间
+	private int connetionTimeout = 30000;// 连接超时时间
 	private ServiceChoiceStrategy strategy = ServiceChoiceStrategy.polling;// 服务选择策略
 
 	public String getZkServers() {
@@ -42,12 +20,20 @@ public class RegisterCenterConfig {
 		this.zkServers = zkServers;
 	}
 
-	public int getTimeout() {
-		return timeout;
+	public int getSessionTimeout() {
+		return sessionTimeout;
 	}
 
-	public void setTimeout(int timeout) {
-		this.timeout = timeout;
+	public void setSessionTimeout(int sessionTimeout) {
+		this.sessionTimeout = sessionTimeout;
+	}
+
+	public int getConnetionTimeout() {
+		return connetionTimeout;
+	}
+
+	public void setConnetionTimeout(int connetionTimeout) {
+		this.connetionTimeout = connetionTimeout;
 	}
 
 	public ServiceChoiceStrategy getStrategy() {
