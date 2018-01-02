@@ -11,6 +11,7 @@
         <module>SimpleRPCCommons</module>
         <module>SimpleRPCServer</module>
         <module>SimpleRPCClient</module>
+        <module>SimpleRPCTests</module>
     </modules>
     <packaging>pom</packaging>
 
