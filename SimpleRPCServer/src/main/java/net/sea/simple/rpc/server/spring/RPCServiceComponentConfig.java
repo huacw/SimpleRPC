@@ -2,7 +2,6 @@ package net.sea.simple.rpc.server.spring;
 
 import java.lang.reflect.Method;
 
-import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
@@ -11,7 +10,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
 
 import net.sea.simple.rpc.server.annotation.RPCService;
-import net.sea.simple.rpc.server.annotation.RPCServiceMethod;
 import net.sea.simple.rpc.server.meta.ServiceMeta;
 import net.sea.simple.rpc.server.meta.ServiceMethodMeta;
 import net.sea.simple.rpc.server.utils.RPCCache;
@@ -72,14 +70,7 @@ public class RPCServiceComponentConfig implements ApplicationContextAware {
 	private ServiceMethodMeta registerRPCServiceMethods(Method[] methods) {
 		ServiceMethodMeta methodMeta = new ServiceMethodMeta();
 		for (Method method : methods) {
-			RPCServiceMethod annotationMethod = method.getAnnotation(RPCServiceMethod.class);
-			if (annotationMethod == null) {
-				continue;
-			}
-			String methodName = annotationMethod.methodName();
-			if (StringUtils.isBlank(methodName)) {
-				methodName = method.getName();
-			}
+			String methodName = method.getName();
 			methodMeta.addMethod(methodName, method);
 		}
 		return methodMeta;

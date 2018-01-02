@@ -34,11 +34,4 @@ public @interface RPCService {
 	 * @return
 	 */
 	public String version() default CommonConstants.DEFAULT_SERVICE_VERSION;
-
-	/**
-	 * 发布的方法
-	 * 
-	 * @return
-	 */
-	public RPCServiceMethod[] publishMethods() default {};
 }

@@ -1,7 +1,5 @@
 package net.sea.simple.rpc.server.test.service;
 
-import net.sea.simple.rpc.server.annotation.RPCServiceMethod;
-
 /**
  * 样例service
  * 
@@ -14,7 +12,6 @@ public interface IDemoService {
 	 * 
 	 * @param name
 	 */
-	@RPCServiceMethod
 	public void say(String name);
 
 	/**
