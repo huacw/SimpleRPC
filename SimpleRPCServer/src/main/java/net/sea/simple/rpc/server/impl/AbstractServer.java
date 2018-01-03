@@ -1,7 +1,10 @@
 package net.sea.simple.rpc.server.impl;
 
+import org.springframework.boot.SpringApplication;
+
 import net.sea.simpl.rpc.register.ServiceRegister;
 import net.sea.simpl.rpc.server.ServiceInfo;
+import net.sea.simpl.rpc.utils.PropertiesConfigUtils;
 import net.sea.simple.rpc.server.IRPCServer;
 import net.sea.simple.rpc.server.config.ServerConfig;
 
@@ -15,17 +18,21 @@ public abstract class AbstractServer implements IRPCServer {
 	protected ServiceRegister serviceRegister;
 
 	@Override
-	public boolean start() {
-		return start(parseConfig());
+	public boolean start(Class<?> bootClass) {
+		return start(bootClass, parseConfig());
 	}
 
 	@Override
-	public boolean start(ServerConfig config) {
-		// TODO Auto-generated method stub
+	public boolean start(Class<?> bootClass, ServerConfig config) {
 		// 启动服务
+		startService(bootClass);
 		// 注册服务
 		serviceRegister.register(createServiceInfo(config));
-		return false;
+		return true;
+	}
+
+	private void startService(Class<?> bootClass) {
+		new SpringApplication(bootClass).run();
 	}
 
 	/**
@@ -43,7 +50,9 @@ public abstract class AbstractServer implements IRPCServer {
 	 */
 	protected ServerConfig parseConfig() {
 		// TODO
-		return new ServerConfig();
+		ServerConfig serverConfig = new ServerConfig();
+		String zkServers = PropertiesConfigUtils.getDefaultProperty("zk.servers");
+		return serverConfig;
 	}
 
 	/**

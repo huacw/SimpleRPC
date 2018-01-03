@@ -53,7 +53,7 @@ public class ServerFactory {
 	 * @throws UnsupportedServerTypeException
 	 */
 	public static boolean run(ServiceType type) throws UnsupportedServerTypeException {
-		return createSever(type).start();
+		return createSever(type).start(null);
 	}
 
 	/**
@@ -67,6 +67,6 @@ public class ServerFactory {
 	 * @throws UnsupportedServerTypeException
 	 */
 	public static boolean run(ServiceType type, ServerConfig config) throws UnsupportedServerTypeException {
-		return createSever(type).start(config);
+		return createSever(type).start(null, config);
 	}
 }

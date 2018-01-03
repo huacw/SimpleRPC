@@ -11,7 +11,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author sea
  *
  */
-@XmlRootElement(name = "command")
+@XmlRootElement(name = "service")
 @XmlAccessorType(XmlAccessType.NONE)
 public class ServerConfig {
 	@XmlAttribute

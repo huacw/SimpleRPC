@@ -1,4 +1,4 @@
-package net.sea.simple.rpc.server.annotation;
+package net.sea.simple.rpc.client.annotation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
@@ -11,16 +11,23 @@ import org.springframework.stereotype.Service;
 import net.sea.simpl.rpc.constants.CommonConstants;
 
 /**
- * rpc服务注解
+ * RPC服务客户端注解
  * 
  * @author sea
  *
  */
-@Target(ElementType.TYPE)
+@Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Service
-public @interface RPCService {
+public @interface RPCClient {
+	/**
+	 * 服务应用名称
+	 * 
+	 * @return
+	 */
+	public String appName();
+
 	/**
 	 * 服务名称
 	 * 
@@ -34,11 +41,4 @@ public @interface RPCService {
 	 * @return
 	 */
 	public String version() default CommonConstants.DEFAULT_SERVICE_VERSION;
-
-	/**
-	 * 发布的类型
-	 * 
-	 * @return
-	 */
-	public Class<?>[] publishClasses();
 }

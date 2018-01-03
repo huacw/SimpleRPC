@@ -11,7 +11,7 @@ import java.util.Map;
 public class RPCHeader {
 	private int crcCode = 0x2468bdf;
 	private int length;// 消息长度
-	private String sessionID;// 会话ID
+	private String sessionId;// 会话ID
 	private byte type;// 消息类型，1-请求，2-响应
 	private byte priority;// 消息优先级
 	private String localHost;// 本地地址
@@ -34,12 +34,12 @@ public class RPCHeader {
 		this.length = length;
 	}
 
-	public String getSessionID() {
-		return sessionID;
+	public String getSessionId() {
+		return sessionId;
 	}
 
-	public void setSessionID(String sessionID) {
-		this.sessionID = sessionID;
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
 	}
 
 	public byte getType() {

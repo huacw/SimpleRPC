@@ -12,17 +12,23 @@ public interface IRPCServer {
 	/**
 	 * 服务器启动
 	 * 
+	 * @param bootClass
+	 *            启动类
 	 * @param config
 	 *            启动参数
+	 * 
 	 * @return 返回是否启动成功，true-启动成功，false-启动失败
 	 */
-	public boolean start(ServerConfig config);
+	public boolean start(Class<?> bootClass, ServerConfig config);
 
 	/**
 	 * 服务器启动
 	 * 
+	 * @param bootClass
+	 *            启动类
+	 * 
 	 * @return 返回是否启动成功，true-启动成功，false-启动失败
 	 */
-	public boolean start();
+	public boolean start(Class<?> bootClass);
 
 }

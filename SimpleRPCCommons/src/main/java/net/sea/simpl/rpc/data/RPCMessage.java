@@ -5,11 +5,10 @@ package net.sea.simpl.rpc.data;
  * 
  * @author sea
  *
- * @param <T>
  */
-public class RPCMessage<T extends RPCBody> {
+public abstract class RPCMessage {
 	private RPCHeader header;
-	private T body;
+	protected RPCBody body;
 
 	public RPCHeader getHeader() {
 		return header;
@@ -19,11 +18,14 @@ public class RPCMessage<T extends RPCBody> {
 		this.header = header;
 	}
 
-	public T getBody() {
+	public RPCBody getBody() {
 		return body;
 	}
 
-	public void setBody(T body) {
-		this.body = body;
-	}
+	/**
+	 * 设置消息体
+	 * 
+	 * @param body
+	 */
+	protected abstract void setBody(RPCBody body);
 }

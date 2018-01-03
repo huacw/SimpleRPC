@@ -12,6 +12,7 @@
 
 	<properties>
 		<spring.verion>4.3.13.RELEASE</spring.verion>
+		<marshalling.verion>2.0.2.Final</marshalling.verion>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -49,6 +50,16 @@
 			<version>4.12</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+            <groupId>org.jboss.marshalling</groupId>
+            <artifactId>jboss-marshalling</artifactId>
+            <version>${marshalling.verion}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.marshalling</groupId>
+            <artifactId>jboss-marshalling-serial</artifactId>
+            <version>${marshalling.verion}</version>
+        </dependency>
 	</dependencies>
 	<build>
 		<resources>
