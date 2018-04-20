@@ -1,6 +1,6 @@
 package net.sea.simple.rpc.server.impl;
 
-import net.sea.simpl.rpc.server.ServiceInfo;
+import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.server.config.ServerConfig;
 
 /**

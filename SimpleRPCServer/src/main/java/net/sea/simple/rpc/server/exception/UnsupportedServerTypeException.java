@@ -1,6 +1,6 @@
 package net.sea.simple.rpc.server.exception;
 
-import net.sea.simpl.rpc.exception.RPCServerException;
+import net.sea.simple.rpc.exception.RPCServerException;
 
 /**
  * 不支持服务器类型异常

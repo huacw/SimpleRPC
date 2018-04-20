@@ -8,37 +8,36 @@ import java.lang.annotation.Target;
 
 import org.springframework.stereotype.Service;
 
-import net.sea.simpl.rpc.constants.CommonConstants;
+import net.sea.simple.rpc.constants.CommonConstants;
 
 /**
  * rpc服务注解
- * 
- * @author sea
  *
+ * @author sea
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Service
 public @interface RPCService {
-	/**
-	 * 服务名称
-	 * 
-	 * @return
-	 */
-	public String serviceName() default "";
+    /**
+     * 服务版本
+     *
+     * @return
+     */
+    public String version() default CommonConstants.DEFAULT_SERVICE_VERSION;
 
-	/**
-	 * 服务版本
-	 * 
-	 * @return
-	 */
-	public String version() default CommonConstants.DEFAULT_SERVICE_VERSION;
+    /**
+     * 发布的类型
+     *
+     * @return
+     */
+    public Class<?>[] publishClasses();
 
-	/**
-	 * 发布的类型
-	 * 
-	 * @return
-	 */
-	public Class<?>[] publishClasses();
+    /**
+     * 发布的方法
+     *
+     * @return
+     */
+    public String[] publishMethods() default {};
 }

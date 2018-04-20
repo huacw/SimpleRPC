@@ -15,8 +15,8 @@ import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
-import net.sea.simpl.rpc.data.codec.RPCMessageDecoder;
-import net.sea.simpl.rpc.data.codec.RPCMessageEncoder;
+import net.sea.simple.rpc.data.codec.RPCMessageDecoder;
+import net.sea.simple.rpc.data.codec.RPCMessageEncoder;
 
 /**
  * RPC服务的服务器端

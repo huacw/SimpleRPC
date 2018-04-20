@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 
 import org.springframework.stereotype.Service;
 
-import net.sea.simpl.rpc.constants.CommonConstants;
+import net.sea.simple.rpc.constants.CommonConstants;
 
 /**
  * RPC服务客户端注解

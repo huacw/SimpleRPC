@@ -18,7 +18,7 @@
 
     <!-- 默认日志输出设置 -->
     <root>
-        <priority value="INFO"/>
+        <priority value="DEBUG"/>
         <appender-ref ref="Console"/>
     </root>
 </log4j:configuration>

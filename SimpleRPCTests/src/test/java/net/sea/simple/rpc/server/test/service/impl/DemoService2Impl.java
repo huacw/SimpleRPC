@@ -9,7 +9,7 @@ import net.sea.simple.rpc.server.test.service.IDemoService;
  * @author sea
  *
  */
-@RPCService(serviceName = "IDemoService2", publishClasses = { IDemoService.class })
+//@RPCService(serviceName = "IDemoService2", publishClasses = { IDemoService.class })
 public class DemoService2Impl implements IDemoService {
 
 	@Override
