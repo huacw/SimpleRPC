@@ -1,5 +1,6 @@
 package net.sea.simple.rpc.server;
 
+import net.sea.simple.rpc.exception.RPCServerException;
 import net.sea.simple.rpc.server.config.ServerConfig;
 
 /**
@@ -19,7 +20,7 @@ public interface IRPCServer {
 	 * 
 	 * @return 返回是否启动成功，true-启动成功，false-启动失败
 	 */
-	public boolean start(Class<?> bootClass, ServerConfig config);
+	public boolean start(Class<?> bootClass, ServerConfig config) throws RPCServerException;
 
 	/**
 	 * 服务器启动
@@ -29,6 +30,6 @@ public interface IRPCServer {
 	 * 
 	 * @return 返回是否启动成功，true-启动成功，false-启动失败
 	 */
-	public boolean start(Class<?> bootClass);
+	public boolean start(Class<?> bootClass) throws RPCServerException;
 
 }

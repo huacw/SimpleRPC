@@ -10,13 +10,11 @@ import net.sea.simple.rpc.constants.CommonConstants;
 public class ServiceInfo {
     private String serviceName;// 服务名称
     private String host;// 服务器地址
-    private int port;// 服务端口
+    private int port = 2000;// 服务端口，默认端口2000
     private int maxConnections = CommonConstants.DEFAULT_MAX_CONNECTIONS;// 最大连接数
     private int currentConnections;// 当前连接数
-    private float weight;// 服务负载
-    private ServiceChoiceStrategy strategy;// 服务选择策略
     private String version = CommonConstants.DEFAULT_SERVICE_VERSION;// 服务版本号
-    private RegisterCenterConfig registerCenterConfig;//注册中心的配置
+    private String serviceType;//服务类型
 
     public ServiceInfo(String serviceName) {
         super();
@@ -74,22 +72,6 @@ public class ServiceInfo {
         this.currentConnections = currentConnections;
     }
 
-    public float getWeight() {
-        return weight;
-    }
-
-    public void setWeight(float weight) {
-        this.weight = weight;
-    }
-
-    public ServiceChoiceStrategy getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(ServiceChoiceStrategy strategy) {
-        this.strategy = strategy;
-    }
-
     public String getVersion() {
         return version;
     }
@@ -98,11 +80,21 @@ public class ServiceInfo {
         this.version = version;
     }
 
-    public RegisterCenterConfig getRegisterCenterConfig() {
-        return registerCenterConfig;
+    public String getServiceType() {
+        return serviceType;
     }
 
-    public void setRegisterCenterConfig(RegisterCenterConfig registerCenterConfig) {
-        this.registerCenterConfig = registerCenterConfig;
+    public void setServiceType(String serviceType) {
+        this.serviceType = serviceType;
+    }
+
+    @Override
+    public String toString() {
+        return "ServiceInfo{" +
+                "serviceName='" + serviceName + '\'' +
+                ", host='" + host + '\'' +
+                ", port=" + port +
+                ", version='" + version + '\'' +
+                '}';
     }
 }

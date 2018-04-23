@@ -1,20 +1,17 @@
 package net.sea.simple.rpc.server.impl;
 
-import net.sea.simple.rpc.server.ServiceInfo;
-import net.sea.simple.rpc.server.config.ServerConfig;
+import net.sea.simple.rpc.server.enumeration.ServiceType;
 
 /**
  * 服务类服务器
- * 
- * @author sea
  *
+ * @author sea
  */
 public class ServiceServer extends AbstractServer {
 
-	@Override
-	protected ServiceInfo createServiceInfo(ServerConfig config) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    @Override
+    protected String getServiceType() {
+        return ServiceType.service.name();
+    }
 
 }

@@ -1,7 +1,6 @@
 package net.sea.simple.rpc.server.impl;
 
-import net.sea.simple.rpc.server.ServiceInfo;
-import net.sea.simple.rpc.server.config.ServerConfig;
+import net.sea.simple.rpc.server.enumeration.ServiceType;
 
 /**
  * 异步消息类服务器
@@ -12,9 +11,8 @@ import net.sea.simple.rpc.server.config.ServerConfig;
 public class MsgServer extends AbstractServer {
 
 	@Override
-	protected ServiceInfo createServiceInfo(ServerConfig config) {
-		// TODO Auto-generated method stub
-		return null;
+	protected String getServiceType() {
+		return ServiceType.asynMsg.name();
 	}
 
 }

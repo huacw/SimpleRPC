@@ -1,7 +1,6 @@
 package net.sea.simple.rpc.server.impl;
 
-import net.sea.simple.rpc.server.ServiceInfo;
-import net.sea.simple.rpc.server.config.ServerConfig;
+import net.sea.simple.rpc.server.enumeration.ServiceType;
 
 /**
  * 任务类服务器
@@ -12,9 +11,8 @@ import net.sea.simple.rpc.server.config.ServerConfig;
 public class TaskServer extends AbstractServer {
 
 	@Override
-	protected ServiceInfo createServiceInfo(ServerConfig config) {
-		// TODO Auto-generated method stub
-		return null;
+	protected String getServiceType() {
+		return ServiceType.task.name();
 	}
 
 }

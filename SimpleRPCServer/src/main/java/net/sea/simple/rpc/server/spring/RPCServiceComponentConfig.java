@@ -1,22 +1,21 @@
 package net.sea.simple.rpc.server.spring;
 
-import java.lang.reflect.Method;
-import java.util.Arrays;
-import java.util.List;
-
+import net.sea.simple.rpc.exception.RPCServerRuntimeException;
+import net.sea.simple.rpc.server.annotation.RPCService;
+import net.sea.simple.rpc.server.meta.ServiceMeta;
+import net.sea.simple.rpc.server.meta.ServiceMethodMeta;
+import net.sea.simple.rpc.server.utils.RPCCache;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.GenericApplicationContext;
-
-import net.sea.simple.rpc.exception.RPCServerRuntimeException;
-import net.sea.simple.rpc.server.annotation.RPCService;
-import net.sea.simple.rpc.server.meta.ServiceMeta;
-import net.sea.simple.rpc.server.meta.ServiceMethodMeta;
-import net.sea.simple.rpc.server.utils.RPCCache;
 import org.springframework.util.CollectionUtils;
+
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 获取注册的服务信息
@@ -35,11 +34,6 @@ public class RPCServiceComponentConfig implements ApplicationContextAware {
             for (String beanName : beanNames) {
                 Object bean = ctx.getBean(beanName);
                 Class<? extends Object> clazz = bean.getClass();
-                // 注册RPC服务对象别名
-//                String alias = clazz.getAnnotation(RPCService.class).serviceName();
-//                if (!StringUtils.isEmpty(alias)) {
-//                    ctx.registerAlias(beanName, alias);
-//                }
                 // 注册RPC服务
                 registerRPCService(clazz, beanName, ctx);
             }

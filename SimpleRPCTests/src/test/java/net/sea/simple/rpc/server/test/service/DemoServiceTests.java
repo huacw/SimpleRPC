@@ -1,5 +1,6 @@
 package net.sea.simple.rpc.server.test.service;
 
+import net.sea.simple.rpc.exception.RPCServerException;
 import net.sea.simple.rpc.server.impl.ServiceServer;
 
 /**
@@ -42,7 +43,11 @@ public class DemoServiceTests {
 		// bean.say("Tom");
 		//
 		// context.close();
-		new ServiceServer().start(DemoServiceTests.class);
+		try {
+			new ServiceServer().start(DemoServiceTests.class);
+		} catch (RPCServerException e) {
+			e.printStackTrace();
+		}
 	}
 
 }

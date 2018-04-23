@@ -1,9 +1,13 @@
 package net.sea.simple.rpc.server.config;
 
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
+import java.beans.ConstructorProperties;
 
 /**
  * 服务器配置
@@ -11,16 +15,12 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author sea
  *
  */
-@XmlRootElement(name = "service")
-@XmlAccessorType(XmlAccessType.NONE)
+@ConfigurationProperties(prefix = "rpc.server.config")
+@Component
 public class ServerConfig {
-	@XmlAttribute
 	private String serviceName;
-	@XmlAttribute
 	private String serviceIp;
-	@XmlAttribute
 	private int port;
-	@XmlAttribute
 	private boolean opened;
 
 	public String getServiceName() {

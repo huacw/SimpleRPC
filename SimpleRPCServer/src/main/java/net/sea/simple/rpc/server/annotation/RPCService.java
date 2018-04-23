@@ -1,14 +1,9 @@
 package net.sea.simple.rpc.server.annotation;
 
-import java.lang.annotation.Documented;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
-
+import net.sea.simple.rpc.constants.CommonConstants;
 import org.springframework.stereotype.Service;
 
-import net.sea.simple.rpc.constants.CommonConstants;
+import java.lang.annotation.*;
 
 /**
  * rpc服务注解
