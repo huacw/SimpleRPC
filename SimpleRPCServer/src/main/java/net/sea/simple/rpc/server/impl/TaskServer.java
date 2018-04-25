@@ -1,5 +1,7 @@
 package net.sea.simple.rpc.server.impl;
 
+import net.sea.simple.rpc.exception.RPCServerException;
+import net.sea.simple.rpc.server.config.ServerConfig;
 import net.sea.simple.rpc.server.enumeration.ServiceType;
 
 /**
@@ -9,6 +11,11 @@ import net.sea.simple.rpc.server.enumeration.ServiceType;
  *
  */
 public class TaskServer extends AbstractServer {
+
+	@Override
+	protected void addListener(ServerConfig config) throws RPCServerException {
+
+	}
 
 	@Override
 	protected String getServiceType() {

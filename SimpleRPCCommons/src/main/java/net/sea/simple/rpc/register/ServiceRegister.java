@@ -4,6 +4,7 @@ import com.github.zkclient.IZkChildListener;
 import com.github.zkclient.IZkDataListener;
 import com.github.zkclient.IZkStateListener;
 import com.github.zkclient.ZkClient;
+import net.sea.simple.rpc.constants.CommonConstants;
 import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 import net.sea.simple.rpc.server.RegisterCenterConfig;
 import net.sea.simple.rpc.server.ServiceInfo;
@@ -12,6 +13,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 
+import java.nio.charset.Charset;
 import java.util.List;
 
 /**
@@ -38,7 +40,6 @@ public class ServiceRegister {
         private Logger logger = Logger.getLogger(getClass());
         private volatile static Register register = null;
         private ZkClient client;
-        private static final String ROOT_PATH = "/rpc/services/v_%s/";
 
         private Register() {
             init();
@@ -71,9 +72,9 @@ public class ServiceRegister {
             }
             // 创建以服务命名的服务节点(临时节点)
             String serviceNodePath = buildNodePath(service, host);
-            client.createEphemeral(serviceNodePath, JsonUtils.toJson(service).getBytes());
+            client.createEphemeral(serviceNodePath, buildServerInfoData(service));
             // 添加监听
-            addWatcher(serviceNodePath);
+            addWatcher(getServiceNameNode(service));
             logger.info(String.format("注册服务：%s", service.toString()));
             return true;
         }
@@ -99,7 +100,7 @@ public class ServiceRegister {
          */
         public boolean reconnect(ServiceInfo service) {
             String path = buildNodePath(service, service.getHost());
-            byte[] datas = JsonUtils.toJson(service).getBytes();
+            byte[] datas = buildServerInfoData(service);
             if (client.exists(path)) {
                 client.writeData(path, datas);
             } else {
@@ -110,13 +111,23 @@ public class ServiceRegister {
         }
 
         /**
+         * 构建服务信息
+         *
+         * @param service
+         * @return
+         */
+        private byte[] buildServerInfoData(ServiceInfo service) {
+            return JsonUtils.toJson(service).getBytes(CommonConstants.DEFAULT_CHARSET);
+        }
+
+        /**
          * 获取服务节点地址
          *
          * @param service
          * @return
          */
         private String getServiceNameNode(ServiceInfo service) {
-            return String.format(ROOT_PATH.concat(service.getServiceName()), service.getVersion());
+            return String.format(CommonConstants.ROOT_PATH.concat(service.getServiceName()), service.getVersion());
         }
 
         /**
@@ -126,8 +137,8 @@ public class ServiceRegister {
          */
         private void addWatcher(String serviceNodePath) {
             Watcher watcher = new Watcher();
-            client.subscribeChildChanges("/rpc/services/v_1.0/net.sea.demo.service", watcher);
-            client.subscribeDataChanges("/rpc/services/v_1.0/net.sea.demo.service", watcher);
+            client.subscribeChildChanges(serviceNodePath, watcher);
+            client.subscribeDataChanges(serviceNodePath, watcher);
             client.subscribeStateChanges(watcher);
         }
 
@@ -157,6 +168,11 @@ public class ServiceRegister {
          * @return
          */
         public ServiceInfo findNode(ServiceInfo service) {
+            if (hasNode(service)) {
+                throw new RPCServerRuntimeException(String.format("未找到服务：%d", service.getServiceName()));
+            }
+            String serviceNameNode = getServiceNameNode(service);
+            List<String> children = client.getChildren(serviceNameNode);
             return null;
         }
 

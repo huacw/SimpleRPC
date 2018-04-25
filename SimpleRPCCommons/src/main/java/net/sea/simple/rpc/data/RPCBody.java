@@ -7,13 +7,4 @@ package net.sea.simple.rpc.data;
  *
  */
 public class RPCBody {
-	private String version;// 服务版本号
-
-	public String getVersion() {
-		return version;
-	}
-
-	public void setVersion(String version) {
-		this.version = version;
-	}
 }

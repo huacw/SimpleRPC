@@ -23,7 +23,24 @@ public class SpringUtils implements ApplicationContextAware {
         return applicationContext;
     }
 
+    /**
+     * 根据类型获取spring对象
+     *
+     * @param clazz
+     * @param <T>
+     * @return
+     */
     public static <T> T getBean(Class<? extends T> clazz) {
         return applicationContext.getBean(clazz);
+    }
+
+    /**
+     * 根据名称获取spring对象
+     *
+     * @param name
+     * @return
+     */
+    public static Object getBean(String name) {
+        return applicationContext.getBean(name);
     }
 }

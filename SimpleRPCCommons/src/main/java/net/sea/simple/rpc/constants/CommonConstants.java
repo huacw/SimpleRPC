@@ -1,5 +1,7 @@
 package net.sea.simple.rpc.constants;
 
+import java.nio.charset.Charset;
+
 /**
  * 公用常量类
  *
@@ -23,11 +25,69 @@ public interface CommonConstants {
      */
     public int SESSION_ID_LENGTH = 32;
     /**
+     * 默认的字符集(字符串类型)
+     */
+    public String DEFAULT_CHARSET_STR = "UTF-8";
+    /**
      * 默认的字符集
      */
-    public String DEFAULT_CHARSET = "UTF-8";
+    public Charset DEFAULT_CHARSET = Charset.forName(DEFAULT_CHARSET_STR);
     /**
      * 默认的心跳超时时间
      */
     public int DEFAULT_HEART_TIMEOUT = 3000;
+    /**
+     * 默认的连接超时时间
+     */
+    public int DEFAULT_CONNECTION_TIMEOUT = 3000;
+    /**
+     * RPC注册中心根节点
+     */
+    public String ROOT_PATH = "/rpc/services/v_%s/";
+    /**
+     * 请求消息类型
+     */
+    public byte REQUEST_MESSAGE_TYPE = 1;
+    /**
+     * 响应消息类型
+     */
+    public byte RESPONSE_MESSAGE_TYPE = 2;
+    /**
+     * 系统正常返回
+     */
+    public int SUCCESS_CODE = 100;
+
+    /**
+     * 错误码
+     */
+    public interface ErrorCode {
+        /**
+         * 系统异常
+         */
+        public int ERR_SYSTEM = 500;
+        /**
+         * 业务默认异常
+         */
+        public int ERR_BIZ_DEFAULT = 501;
+        /**
+         * 业务默认运行时异常
+         */
+        public int ERR_BIZ_RUNTIME_DEFAULT = 502;
+        /**
+         * 请求数据包体格式异常
+         */
+        public int ERR_REQUEST_BODY_STYLE = 503;
+        /**
+         * 未知的服务异常
+         */
+        public int ERR_UNKNOWN_SERVICE = 504;
+        /**
+         * 未知的方法异常
+         */
+        public int ERR_UNKNOWN_METHOD = 505;
+        /**
+         * 未知的方法异常
+         */
+        public int ERR_NO_METHOD = 506;
+    }
 }

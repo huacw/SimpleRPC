@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 @Component
 public class RegisterCenterConfig {
     private String zkServers;// zk服务器地址
-    private int sessionTimeout = 1000;// 会话超时时间
-    private int connetionTimeout = CommonConstants.DEFAULT_HEART_TIMEOUT;// 连接超时时间
+    private int sessionTimeout = CommonConstants.DEFAULT_HEART_TIMEOUT;// 会话超时时间
+    private int connetionTimeout = CommonConstants.DEFAULT_CONNECTION_TIMEOUT;// 连接超时时间
 
     public String getZkServers() {
         return zkServers;

@@ -30,10 +30,10 @@ public @interface RPCClient {
 
 	/**
 	 * 服务名称
-	 * 
+	 *
 	 * @return
 	 */
-	public String serviceName() default "";
+//	public Class<?>[] serviceName() default {};
 
 	/**
 	 * 服务版本

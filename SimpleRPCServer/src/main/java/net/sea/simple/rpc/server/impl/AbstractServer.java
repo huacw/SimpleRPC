@@ -21,10 +21,10 @@ import net.sea.simple.rpc.server.RegisterCenterConfig;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.server.config.ServerConfig;
 import net.sea.simple.rpc.utils.SpringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -74,49 +74,7 @@ public abstract class AbstractServer implements IRPCServer {
      * @param config
      * @throws RPCServerException
      */
-    protected void addListener(ServerConfig config) throws RPCServerException {
-        // 配置服务端的NIO线程组
-        EventLoopGroup bossGroup = new NioEventLoopGroup();
-        EventLoopGroup workerGroup = new NioEventLoopGroup();
-        int port = config.getPort();
-        String host = getLocalIP();
-        try {
-            ServerBootstrap b = new ServerBootstrap();
-
-            b.group(bossGroup, workerGroup)
-                    .channel(NioServerSocketChannel.class)
-                    .option(ChannelOption.SO_BACKLOG, 100)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .childHandler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        public void initChannel(SocketChannel ch) throws IOException {
-                            ch.pipeline().addLast(new RPCMessageDecoder(1024 * 1024, 4, 4))
-                                    .addLast(new RPCMessageEncoder())
-                                    .addLast("readTimeoutHandler", new ReadTimeoutHandler(50))
-                                    .addLast("serviceHandler", null);
-                            // ch.pipeline().addLast("HeartBeatHandler", new
-                            // HeartBeatRespHandler());
-                        }
-                    });
-
-            // 绑定端口，同步等待成功
-            ChannelFuture f = b.bind(port).sync();
-            if (org.apache.commons.lang3.StringUtils.isBlank(host)) {
-                f = b.bind(port).sync();
-            } else {
-                f = b.bind(host, port);
-            }
-
-            // 等待服务端监听端口关闭
-            f.channel().closeFuture().sync();
-        } catch (Exception e) {
-            throw new RPCServerException(e);
-        } finally {
-            // 优雅退出，释放线程池资源
-            bossGroup.shutdownGracefully();
-            workerGroup.shutdownGracefully();
-        }
-    }
+    protected abstract void addListener(ServerConfig config) throws RPCServerException;
 
     private void startService(Class<?> bootClass) {
         new SpringApplication(bootClass).run();

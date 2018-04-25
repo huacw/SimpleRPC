@@ -94,6 +94,6 @@ public final class RPCCache {
      * @return
      */
     public synchronized ServiceMeta findService(Class<?> serviceType) {
-        return SERVICE_CACHE.get(serviceType.getName());
+        return findService(serviceType.getName());
     }
 }
