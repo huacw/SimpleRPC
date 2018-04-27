@@ -1,20 +1,26 @@
 package net.sea.simple.rpc.register;
 
-import com.github.zkclient.IZkChildListener;
-import com.github.zkclient.IZkDataListener;
-import com.github.zkclient.IZkStateListener;
-import com.github.zkclient.ZkClient;
-import net.sea.simple.rpc.constants.CommonConstants;
-import net.sea.simple.rpc.exception.RPCServerRuntimeException;
-import net.sea.simple.rpc.server.RegisterCenterConfig;
-import net.sea.simple.rpc.server.ServiceInfo;
-import net.sea.simple.rpc.utils.JsonUtils;
+import java.util.List;
+
+import net.sea.simple.rpc.server.loadbalancer.strategy.zk.ZKRoundLoadBalancerStrategy;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 
-import java.nio.charset.Charset;
-import java.util.List;
+import com.github.zkclient.IZkChildListener;
+import com.github.zkclient.IZkDataListener;
+import com.github.zkclient.IZkStateListener;
+import com.github.zkclient.ZkClient;
+
+import net.sea.simple.rpc.constants.CommonConstants;
+import net.sea.simple.rpc.exception.RPCServerRuntimeException;
+import net.sea.simple.rpc.server.RegisterCenterConfig;
+import net.sea.simple.rpc.server.ServiceInfo;
+import net.sea.simple.rpc.server.loadbalancer.LoadBalancerStrategy;
+import net.sea.simple.rpc.server.loadbalancer.context.LoadBalancerContext;
+import net.sea.simple.rpc.server.loadbalancer.context.zk.ZKLoadBalancerContext;
+import net.sea.simple.rpc.utils.JsonUtils;
+import net.sea.simple.rpc.utils.ZKUtils;
 
 /**
  * 服务注册器
@@ -127,7 +133,7 @@ public class ServiceRegister {
          * @return
          */
         private String getServiceNameNode(ServiceInfo service) {
-            return String.format(CommonConstants.ROOT_PATH.concat(service.getServiceName()), service.getVersion());
+            return ZKUtils.getServiceNameNode(service);
         }
 
         /**
@@ -168,12 +174,31 @@ public class ServiceRegister {
          * @return
          */
         public ServiceInfo findNode(ServiceInfo service) {
-            if (hasNode(service)) {
-                throw new RPCServerRuntimeException(String.format("未找到服务：%d", service.getServiceName()));
+            try {
+                LoadBalancerStrategy loadBalancerStrategy = getLoadBalancerStrategy();
+                LoadBalancerContext context = new ZKLoadBalancerContext(client);
+                context.setService(service);
+                return loadBalancerStrategy.choose(context);
+            } catch (ClassNotFoundException | ClassCastException | IllegalAccessException | InstantiationException e) {
+                throw new RPCServerRuntimeException(e);
             }
-            String serviceNameNode = getServiceNameNode(service);
-            List<String> children = client.getChildren(serviceNameNode);
-            return null;
+        }
+
+        /**
+         * 获取负载均衡策略,默认为net.sea.simple.rpc.server.loadbalancer.strategy.zk.ZKRoundLoadBalancerStrategy（轮询策略）
+         *
+         * @return
+         * @throws InstantiationException
+         * @throws IllegalAccessException
+         * @throws ClassNotFoundException
+         */
+        private LoadBalancerStrategy getLoadBalancerStrategy() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
+            String loadBalancer = config.getLoadBalancer();
+            if (StringUtils.isBlank(loadBalancer)) {
+                return new ZKRoundLoadBalancerStrategy();
+            } else {
+                return (LoadBalancerStrategy) Class.forName(loadBalancer).newInstance();
+            }
         }
 
         /**
@@ -183,15 +208,7 @@ public class ServiceRegister {
          * @return
          */
         public boolean hasNode(ServiceInfo service) {
-            String serviceName = service.getServiceName();
-            if (StringUtils.isBlank(serviceName)) {
-                return false;
-            }
-            String host = service.getHost();
-            if (StringUtils.isBlank(host)) {
-                return client.exists(getServiceNameNode(service));
-            }
-            return client.exists(getServiceNameNode(service).concat("/").concat(host));
+            return ZKUtils.hasNode(client, service);
         }
 
         /**

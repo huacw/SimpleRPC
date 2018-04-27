@@ -1,8 +1,15 @@
 package net.sea.simple.rpc.client.proxy;
 
+import java.lang.reflect.Method;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+
+import net.sea.simple.rpc.contract.DemoService;
+import net.sea.simple.rpc.utils.JsonUtils;
+import org.apache.log4j.Logger;
+
 import io.netty.channel.ChannelFuture;
 import net.sea.simple.rpc.client.annotation.RPCClient;
-import net.sea.simple.rpc.constants.CommonConstants;
 import net.sea.simple.rpc.register.ServiceRegister;
 import net.sea.simple.rpc.server.RegisterCenterConfig;
 import net.sea.simple.rpc.server.ServiceInfo;
@@ -10,10 +17,7 @@ import net.sea.simple.rpc.utils.SpringUtils;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
+import org.springframework.util.ReflectionUtils;
 
 /**
  * RPC服务代理类型
@@ -21,6 +25,7 @@ import java.util.concurrent.ConcurrentMap;
  * @author sea
  */
 public class ServiceProxy implements MethodInterceptor {
+    private Logger logger = Logger.getLogger(getClass());
     private Enhancer enhancer = new Enhancer();
     private Class<?> clazz;
     private RPCClient client;
@@ -37,7 +42,7 @@ public class ServiceProxy implements MethodInterceptor {
      * @param clazz  服务接口
      * @return
      */
-    public synchronized static ServiceProxy newProxy(RPCClient client, Class<?> clazz) {
+    public static synchronized ServiceProxy newProxy(RPCClient client, Class<?> clazz) {
         ServiceProxy serviceProxy = null;
         serviceProxy = proxyCache.get(clazz);
         if (serviceProxy == null) {
@@ -72,7 +77,9 @@ public class ServiceProxy implements MethodInterceptor {
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         //连接RPC服务
         ChannelFuture future = connectRPCService();
-        return methodProxy.invokeSuper(obj, args);
+        System.out.println("args:" + JsonUtils.toJson(args));
+//        return methodProxy.invokeSuper(obj, args);
+        return JsonUtils.toBean("", method.getReturnType());
     }
 
     /**
@@ -83,6 +90,7 @@ public class ServiceProxy implements MethodInterceptor {
     private ChannelFuture connectRPCService() {
         ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
         ServiceInfo serviceInfo = serviceRegister.findService(this.client.appName());
+        logger.info(String.format("获取的服务信息：%s", serviceInfo.toString()));
         return null;
     }
 

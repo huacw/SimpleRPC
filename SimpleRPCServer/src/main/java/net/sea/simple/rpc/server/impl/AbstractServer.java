@@ -86,7 +86,7 @@ public abstract class AbstractServer implements IRPCServer {
      * @return
      */
     protected String getLocalIP() {
-        List<String> result = new ArrayList<String>();
+        List<String> result = new ArrayList<>();
         Enumeration<NetworkInterface> netInterfaces;
         String defaultIP = "127.0.0.1";
         try {

@@ -31,7 +31,7 @@ public class JsonUtils {
 	 * @return
 	 */
 	private static Gson createGson(String datePattern) {
-		return new GsonBuilder().excludeFieldsWithoutExposeAnnotation() // 不对没有用@Expose注解的属性进行操作
+		return new GsonBuilder()//.excludeFieldsWithoutExposeAnnotation() // 不对没有用@Expose注解的属性进行操作
 				.enableComplexMapKeySerialization() // 当Map的key为复杂对象时,需要开启该方法
 				.serializeNulls() // 当字段值为空或null时，依然对该字段进行转换
 				.setDateFormat(datePattern) // 时间转化为特定格式

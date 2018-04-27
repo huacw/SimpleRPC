@@ -28,6 +28,7 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 /**
  * 服务类服务器
@@ -114,11 +115,15 @@ public class ServiceServer extends AbstractServer {
             }
             //执行服务方法
             Object result = service.invoke(body.getMethod(), body.getArgs().toArray());
-            response.getHeader().setStatusCode(CommonConstants.SUCCESS_CODE);
-            RPCResponseBody responseBody = new RPCResponseBody();
-            responseBody.setResult(result);
-            response.setResponseBody(responseBody);
-            ctx.writeAndFlush(request);
+            if (result instanceof Serializable) {
+                response.getHeader().setStatusCode(CommonConstants.SUCCESS_CODE);
+                RPCResponseBody responseBody = new RPCResponseBody();
+                responseBody.setResult((Serializable) result);
+                response.setResponseBody(responseBody);
+                ctx.writeAndFlush(request);
+            } else {
+
+            }
         }
 
         /**
@@ -177,7 +182,6 @@ public class ServiceServer extends AbstractServer {
             header.setType(CommonConstants.RESPONSE_MESSAGE_TYPE);
             response.setHeader(header);
             RPCResponseBody body = new RPCResponseBody();
-            body.setErrClassName(cause.getClass().getName());
             body.setResult(cause);
             response.setResponseBody(body);
             ctx.writeAndFlush(response);
