@@ -3,6 +3,7 @@ package net.sea.simple.rpc.utils;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
+import com.sun.jmx.snmp.ThreadContext;
 import io.netty.buffer.ByteBuf;
 import net.sea.simple.rpc.constants.CommonConstants;
 import org.apache.commons.lang3.StringUtils;
@@ -13,12 +14,48 @@ import org.apache.commons.lang3.StringUtils;
  * @author sea
  */
 public class ContextUtils {
+    private static ContextUtils context;
+    private ThreadLocal<String> localContainer = new ThreadLocal<>();
+
+    private ContextUtils() {
+    }
+
+    /**
+     * 获取上下文对象
+     *
+     * @return
+     */
+    public static ContextUtils getContext() {
+        if (context == null) {
+            synchronized (ThreadContext.class) {
+                if (context == null) {
+                    context = new ContextUtils();
+                }
+            }
+        }
+        return context;
+    }
+
+    /**
+     * 获取上下文id
+     *
+     * @return
+     */
+    public String getContextId() {
+        String contextId = localContainer.get();
+        if (StringUtils.isBlank(contextId)) {
+            contextId = genSessionId();
+            localContainer.set(contextId);
+        }
+        return contextId;
+    }
+
     /**
      * 生成sessionId
      *
      * @return
      */
-    public static String genSessionId() {
+    private static String genSessionId() {
         return UUID.randomUUID().toString().replaceAll("-", "");
     }
 

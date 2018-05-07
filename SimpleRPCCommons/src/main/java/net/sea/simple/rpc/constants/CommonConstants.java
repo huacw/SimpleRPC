@@ -56,6 +56,18 @@ public interface CommonConstants {
      * 系统正常返回
      */
     public int SUCCESS_CODE = 100;
+    /**
+     * 请求优先级（正常）
+     */
+    public byte REQUEST_NORMAL_PRIORITY = 5;
+    /**
+     * 请求优先级（最大）
+     */
+    public byte REQUEST_MAX_PRIORITY = 10;
+    /**
+     * 请求优先级（最小）
+     */
+    public byte REQUEST_MIN_PRIORITY = 1;
 
     /**
      * 错误码

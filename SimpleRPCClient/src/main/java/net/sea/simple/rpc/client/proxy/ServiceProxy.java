@@ -1,23 +1,39 @@
 package net.sea.simple.rpc.client.proxy;
 
-import java.lang.reflect.Method;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
-
-import net.sea.simple.rpc.contract.DemoService;
-import net.sea.simple.rpc.utils.JsonUtils;
-import org.apache.log4j.Logger;
-
-import io.netty.channel.ChannelFuture;
+import io.netty.bootstrap.Bootstrap;
+import io.netty.channel.*;
+import io.netty.channel.socket.SocketChannel;
+import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.timeout.ReadTimeoutHandler;
 import net.sea.simple.rpc.client.annotation.RPCClient;
+import net.sea.simple.rpc.constants.CommonConstants;
+import net.sea.simple.rpc.data.RPCHeader;
+import net.sea.simple.rpc.data.codec.RPCMessageDecoder;
+import net.sea.simple.rpc.data.codec.RPCMessageEncoder;
+import net.sea.simple.rpc.data.request.RPCRequest;
+import net.sea.simple.rpc.data.request.RPCRequestBody;
+import net.sea.simple.rpc.data.response.RPCResponse;
+import net.sea.simple.rpc.data.response.RPCResponseBody;
+import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 import net.sea.simple.rpc.register.ServiceRegister;
 import net.sea.simple.rpc.server.RegisterCenterConfig;
 import net.sea.simple.rpc.server.ServiceInfo;
+import net.sea.simple.rpc.utils.JsonUtils;
 import net.sea.simple.rpc.utils.SpringUtils;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
-import org.springframework.util.ReflectionUtils;
+import org.apache.log4j.Logger;
+
+import java.io.Closeable;
+import java.io.IOException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * RPC服务代理类型
@@ -77,7 +93,10 @@ public class ServiceProxy implements MethodInterceptor {
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         //连接RPC服务
         ChannelFuture future = connectRPCService();
+//        RPCClientChannel channel = (RPCClientChannel) future.channel();
+//        channel.writeAndFlush(null);
         System.out.println("args:" + JsonUtils.toJson(args));
+        System.out.println("clazz:" + clazz.getName());
 //        return methodProxy.invokeSuper(obj, args);
         return JsonUtils.toBean("", method.getReturnType());
     }
@@ -94,4 +113,160 @@ public class ServiceProxy implements MethodInterceptor {
         return null;
     }
 
+    /**
+     * RPC客户端
+     *
+     * @author sea
+     */
+    private class RPCNettyClient implements Closeable {
+        private ChannelFuture future;
+        private EventLoopGroup group;
+
+        public RPCNettyClient() throws InterruptedException {
+            initClient();
+        }
+
+        private void initClient() throws InterruptedException {
+            ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
+            ServiceInfo serviceInfo = serviceRegister.findService(client.appName());
+            logger.info(String.format("获取的服务信息：%s", serviceInfo.toString()));
+
+            Bootstrap bootstrap = new Bootstrap();
+            bootstrap.group(group)
+                    .channel(RPCClientChannel.class)
+                    .option(ChannelOption.TCP_NODELAY, true)
+                    .handler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel ch) throws Exception {
+                            ch.pipeline().addLast("decoder", new RPCMessageDecoder(1024 * 1024, 4, 4))
+                                    .addLast("encoder", new RPCMessageEncoder())
+                                    .addLast("readTimeoutHandler", new ReadTimeoutHandler(60))
+                                    .addLast("clientHandler", new ClientHandler());
+                        }
+                    });
+            this.future = bootstrap.connect(serviceInfo.getHost(), serviceInfo.getPort()).sync();
+        }
+
+        /**
+         * 执行方法
+         *
+         * @param method
+         * @param args
+         * @return
+         */
+        public Object invoke(Method method, Object[] args) throws InterruptedException {
+            RPCRequest request = new RPCRequest();
+            request.setHeader(buildRpcHeader());
+            request.setRequestBody(buildRpcBody(method, args));
+            RPCClientChannel channel = (RPCClientChannel) this.future.channel();
+            channel.reset();
+            channel.writeAndFlush(request);
+            RPCResponse response = channel.get(10000);
+            RPCHeader responseHeader = response.getHeader();
+            if (responseHeader.getStatusCode() != CommonConstants.SUCCESS_CODE) {
+                RPCResponseBody body = (RPCResponseBody) response.getBody();
+                Throwable result = (Throwable) body.getResult();
+                logger.error("", result);
+                throw new RPCServerRuntimeException(result);
+            } else {
+                RPCResponseBody body = (RPCResponseBody) response.getBody();
+                return body.getResult();
+            }
+        }
+
+        /**
+         * 构建请求内容
+         *
+         * @param method
+         * @param args
+         * @return
+         */
+        private RPCRequestBody buildRpcBody(Method method, Object[] args) {
+            RPCRequestBody body = new RPCRequestBody();
+            body.setArgs(Arrays.asList(args));
+            body.setMethod(method.getName());
+            body.setServiceName(clazz.getName());
+            return body;
+        }
+
+        /**
+         * 构建请求头
+         *
+         * @return
+         */
+        private RPCHeader buildRpcHeader() {
+            RPCHeader header = new RPCHeader();
+            header.setType(CommonConstants.REQUEST_MESSAGE_TYPE);
+            header.setVersion(CommonConstants.DEFAULT_SERVICE_VERSION);
+            header.setPriority(CommonConstants.REQUEST_NORMAL_PRIORITY);
+            return header;
+        }
+
+        @Override
+        public void close() throws IOException {
+            this.future.channel().close();
+            this.group.shutdownGracefully();
+            logger.info("rpc客户端关闭");
+        }
+    }
+
+    /**
+     * 客户端消息处理器
+     *
+     * @author sea
+     */
+    private class ClientHandler extends SimpleChannelInboundHandler<RPCResponse> {
+
+        @Override
+        protected void channelRead0(ChannelHandlerContext ctx, RPCResponse msg) throws Exception {
+            RPCClientChannel channel = (RPCClientChannel) ctx.channel();
+            channel.set(msg);
+        }
+    }
+
+    /**
+     * RPC客户端通道
+     *
+     * @author sea
+     */
+    public class RPCClientChannel extends NioSocketChannel {
+
+        private RPCResponse responseMessage;
+
+        private ReentrantLock lock = new ReentrantLock();
+
+        private Condition hasMessage = lock.newCondition();
+
+        public void reset() {
+            this.responseMessage = null;
+        }
+
+        public RPCResponse get(long timeout) throws InterruptedException {
+            lock.lock();
+            try {
+                long end = System.currentTimeMillis() + timeout;
+                long time = timeout;
+                while (responseMessage == null) {
+                    boolean ok = hasMessage.await(time, TimeUnit.MILLISECONDS);
+                    if (ok || (time = end - System.currentTimeMillis()) <= 0) {
+                        break;
+                    }
+                }
+            } finally {
+                lock.unlock();
+            }
+            return responseMessage;
+        }
+
+        public void set(RPCResponse message) {
+            lock.lock();
+            try {
+                responseMessage = message;
+                hasMessage.signal();
+            } finally {
+                lock.unlock();
+            }
+        }
+
+    }
 }
