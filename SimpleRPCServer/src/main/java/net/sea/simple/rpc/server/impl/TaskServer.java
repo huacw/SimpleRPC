@@ -13,7 +13,7 @@ import net.sea.simple.rpc.server.enumeration.ServiceType;
 public class TaskServer extends AbstractServer {
 
 	@Override
-	protected void addListener(ServerConfig config) throws RPCServerException {
+	protected void addListener(ServerConfig config, RegCallback callback) throws RPCServerException {
 
 	}
 

@@ -2,8 +2,11 @@ package net.sea.simple.rpc.client.proxy;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.*;
+import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.logging.LogLevel;
+import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import net.sea.simple.rpc.client.annotation.RPCClient;
 import net.sea.simple.rpc.constants.CommonConstants;
@@ -18,6 +21,8 @@ import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 import net.sea.simple.rpc.register.ServiceRegister;
 import net.sea.simple.rpc.server.RegisterCenterConfig;
 import net.sea.simple.rpc.server.ServiceInfo;
+import net.sea.simple.rpc.utils.ContextUtils;
+import net.sea.simple.rpc.utils.HostUtils;
 import net.sea.simple.rpc.utils.JsonUtils;
 import net.sea.simple.rpc.utils.SpringUtils;
 import net.sf.cglib.proxy.Enhancer;
@@ -92,25 +97,16 @@ public class ServiceProxy implements MethodInterceptor {
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         //连接RPC服务
-        ChannelFuture future = connectRPCService();
+//        ChannelFuture future = connectRPCService();
 //        RPCClientChannel channel = (RPCClientChannel) future.channel();
 //        channel.writeAndFlush(null);
         System.out.println("args:" + JsonUtils.toJson(args));
         System.out.println("clazz:" + clazz.getName());
 //        return methodProxy.invokeSuper(obj, args);
-        return JsonUtils.toBean("", method.getReturnType());
-    }
-
-    /**
-     * 连接RPC服务
-     *
-     * @return
-     */
-    private ChannelFuture connectRPCService() {
-        ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
-        ServiceInfo serviceInfo = serviceRegister.findService(this.client.appName());
-        logger.info(String.format("获取的服务信息：%s", serviceInfo.toString()));
-        return null;
+        try(RPCNettyClient client = new RPCNettyClient();){
+            return client.invoke(method,args);
+        }
+//        return JsonUtils.toBean("", method.getReturnType());
     }
 
     /**
@@ -121,6 +117,7 @@ public class ServiceProxy implements MethodInterceptor {
     private class RPCNettyClient implements Closeable {
         private ChannelFuture future;
         private EventLoopGroup group;
+        private ServiceInfo serviceInfo;
 
         public RPCNettyClient() throws InterruptedException {
             initClient();
@@ -128,17 +125,21 @@ public class ServiceProxy implements MethodInterceptor {
 
         private void initClient() throws InterruptedException {
             ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
-            ServiceInfo serviceInfo = serviceRegister.findService(client.appName());
+            serviceInfo = serviceRegister.findService(client.appName());
             logger.info(String.format("获取的服务信息：%s", serviceInfo.toString()));
 
+            //打开远程连接
+            group = new NioEventLoopGroup();
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(group)
                     .channel(RPCClientChannel.class)
                     .option(ChannelOption.TCP_NODELAY, true)
+                    .handler(new LoggingHandler(LogLevel.DEBUG))
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline().addLast("decoder", new RPCMessageDecoder(1024 * 1024, 4, 4))
+                            ch.pipeline()
+                                    .addLast("decoder", new RPCMessageDecoder(1024 * 1024, 4, 4))
                                     .addLast("encoder", new RPCMessageEncoder())
                                     .addLast("readTimeoutHandler", new ReadTimeoutHandler(60))
                                     .addLast("clientHandler", new ClientHandler());
@@ -161,7 +162,7 @@ public class ServiceProxy implements MethodInterceptor {
             RPCClientChannel channel = (RPCClientChannel) this.future.channel();
             channel.reset();
             channel.writeAndFlush(request);
-            RPCResponse response = channel.get(10000);
+            RPCResponse response = channel.get(1000000);
             RPCHeader responseHeader = response.getHeader();
             if (responseHeader.getStatusCode() != CommonConstants.SUCCESS_CODE) {
                 RPCResponseBody body = (RPCResponseBody) response.getBody();
@@ -199,6 +200,9 @@ public class ServiceProxy implements MethodInterceptor {
             header.setType(CommonConstants.REQUEST_MESSAGE_TYPE);
             header.setVersion(CommonConstants.DEFAULT_SERVICE_VERSION);
             header.setPriority(CommonConstants.REQUEST_NORMAL_PRIORITY);
+            header.setSessionId(ContextUtils.getContext().getContextId());
+            header.setLocalHost(HostUtils.getLocalIP());
+            header.setRemoteHost(serviceInfo.getHost());
             return header;
         }
 
@@ -229,7 +233,7 @@ public class ServiceProxy implements MethodInterceptor {
      *
      * @author sea
      */
-    public class RPCClientChannel extends NioSocketChannel {
+    public static class RPCClientChannel extends NioSocketChannel {
 
         private RPCResponse responseMessage;
 

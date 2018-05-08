@@ -33,9 +33,10 @@ public final class RPCMessageEncoder extends MessageToByteEncoder<RPCMessage> {
             throw new RPCServerException("The encode message is null");
         RPCHeader header = msg.getHeader();
         sendBuf.writeInt(header.getCrcCode());
-        ByteBufUtils.writeString(sendBuf, header.getVersion());
+        sendBuf.writeInt(0);//报文长度
         byte type = header.getType();
         sendBuf.writeByte(type);
+        ByteBufUtils.writeString(sendBuf, header.getVersion());
         //写出响应码
         if (type == CommonConstants.RESPONSE_MESSAGE_TYPE) {
             sendBuf.writeInt(header.getStatusCode());

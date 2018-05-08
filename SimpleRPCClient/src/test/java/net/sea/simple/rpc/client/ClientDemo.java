@@ -17,6 +17,6 @@ public class ClientDemo {
     private DemoService demoService1;
 
     public void sayHello() {
-        demoService.say("Jack");
+        System.out.println(demoService.say("Jack"));
     }
 }

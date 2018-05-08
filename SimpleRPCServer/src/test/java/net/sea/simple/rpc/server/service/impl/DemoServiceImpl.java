@@ -9,9 +9,9 @@ import net.sea.simple.rpc.server.annotation.RPCService;
  * @Version 1.0
  */
 @RPCService(publishClasses = {DemoService.class})
-public class DemoServiceImpl implements DemoService{
+public class DemoServiceImpl implements DemoService {
     @Override
     public String say(String name) {
-        return null;
+        return "Hello," + name;
     }
 }

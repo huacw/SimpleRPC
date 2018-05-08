@@ -23,6 +23,7 @@ import net.sea.simple.rpc.server.config.ServerConfig;
 import net.sea.simple.rpc.server.enumeration.ServiceType;
 import net.sea.simple.rpc.server.meta.ServiceMeta;
 import net.sea.simple.rpc.server.utils.RPCCache;
+import net.sea.simple.rpc.utils.HostUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
@@ -46,14 +47,15 @@ public class ServiceServer extends AbstractServer {
      * 添加服务监听
      *
      * @param config
+     * @param callback
      * @throws RPCServerException
      */
-    protected void addListener(ServerConfig config) throws RPCServerException {
+    protected void addListener(ServerConfig config, RegCallback callback) throws RPCServerException {
         // 配置服务端的NIO线程组
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         int port = config.getPort();
-        String host = getLocalIP();
+        String host = HostUtils.getLocalIP();
         config.setServiceIp(host);
         try {
             ServerBootstrap b = new ServerBootstrap();
@@ -61,7 +63,7 @@ public class ServiceServer extends AbstractServer {
             b.group(bossGroup, workerGroup)
                     .channel(NioServerSocketChannel.class)
                     .option(ChannelOption.SO_BACKLOG, 100)
-                    .handler(new LoggingHandler(LogLevel.INFO))
+                    .handler(new LoggingHandler(LogLevel.DEBUG))
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws IOException {
@@ -73,15 +75,19 @@ public class ServiceServer extends AbstractServer {
                     });
 
             // 绑定端口，同步等待成功
-            ChannelFuture f = b.bind(port).sync();
+//            ChannelFuture f = b.bind(port).sync();
+            ChannelFuture f;
             if (StringUtils.isBlank(host)) {
                 f = b.bind(port).sync();
             } else {
-                f = b.bind(host, port);
+                f = b.bind(host, port).sync();
             }
 
             // 等待服务端监听端口关闭
-            f.channel().closeFuture().sync();
+            ChannelFuture channelFuture = f.channel().closeFuture();
+            // 执行回调
+            callback.execute();
+            channelFuture.sync();
         } catch (Exception e) {
             throw new RPCServerException(e);
         } finally {
@@ -115,14 +121,14 @@ public class ServiceServer extends AbstractServer {
             }
             //执行服务方法
             Object result = service.invoke(body.getMethod(), body.getArgs().toArray());
-            if (result instanceof Serializable) {
+            if (result == null || result instanceof Serializable) {
                 response.getHeader().setStatusCode(CommonConstants.SUCCESS_CODE);
                 RPCResponseBody responseBody = new RPCResponseBody();
                 responseBody.setResult((Serializable) result);
                 response.setResponseBody(responseBody);
-                ctx.writeAndFlush(request);
+                ctx.writeAndFlush(response);
             } else {
-
+                throw new RPCServerRuntimeException("返回参数不支持序列化");
             }
         }
 
@@ -158,7 +164,7 @@ public class ServiceServer extends AbstractServer {
             }
             BeanUtils.copyProperties(requestHeader, header);
             header.setType(CommonConstants.RESPONSE_MESSAGE_TYPE);
-            header.setLocalHost(requestHeader.getRemoteHost());
+            header.setLocalHost(HostUtils.getLocalIP());
             header.setRemoteHost(requestHeader.getLocalHost());
             header.setExProperties(null);
             return header;

@@ -24,7 +24,9 @@ public class ByteBufUtils {
         if (length == 0) {
             return null;
         }
-        return new String(buf.readBytes(new byte[length]).array(), CommonConstants.DEFAULT_CHARSET);
+        byte[] dst = new byte[length];
+        buf.readBytes(dst);
+        return new String(dst, CommonConstants.DEFAULT_CHARSET);
     }
 
     /**

@@ -32,9 +32,9 @@ public abstract class Callback {
             RPCHeader header = new RPCHeader();
             header.setCrcCode(buf.readInt());
             header.setLength(buf.readInt());
-            header.setVersion(ByteBufUtils.readString(buf));
             byte type = buf.readByte();
             header.setType(type);
+            header.setVersion(ByteBufUtils.readString(buf));
             //设置响应码
             if (type == CommonConstants.RESPONSE_MESSAGE_TYPE) {
                 header.setStatusCode(buf.readInt());
