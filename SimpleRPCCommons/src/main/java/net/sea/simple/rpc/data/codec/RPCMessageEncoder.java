@@ -7,12 +7,14 @@ import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.sea.simple.rpc.constants.CommonConstants;
+import net.sea.simple.rpc.data.RPCBody;
 import net.sea.simple.rpc.data.RPCHeader;
 import net.sea.simple.rpc.data.RPCMessage;
 import net.sea.simple.rpc.exception.RPCServerException;
 import net.sea.simple.rpc.utils.ByteBufUtils;
 import net.sea.simple.rpc.utils.ContextUtils;
 import net.sea.simple.rpc.utils.MapUtils;
+import net.sea.simple.rpc.utils.XStreamUtil;
 
 /**
  * RPC服务编码器
@@ -47,7 +49,9 @@ public final class RPCMessageEncoder extends MessageToByteEncoder<RPCMessage> {
         ContextUtils.writeSessionId(sendBuf, header.getSessionId());
         ByteBufUtils.writeMap(sendBuf, header.getExProperties());
         if (msg.getBody() != null) {
-            marshallingEncoder.encode(msg.getBody(), sendBuf);
+            //marshallingEncoder.encode(msg.getBody(), sendBuf);
+            //使用xml格式数据传输
+            ByteBufUtils.writeString(sendBuf, XStreamUtil.beanToXml(msg.getBody()));
         } else {
             sendBuf.writeInt(0);
         }

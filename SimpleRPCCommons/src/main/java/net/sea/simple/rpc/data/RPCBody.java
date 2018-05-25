@@ -8,5 +8,5 @@ import java.io.Serializable;
  * @author sea
  *
  */
-public class RPCBody implements Serializable{
+public class RPCBody{
 }

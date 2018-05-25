@@ -96,17 +96,10 @@ public class ServiceProxy implements MethodInterceptor {
 
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
-        //连接RPC服务
-//        ChannelFuture future = connectRPCService();
-//        RPCClientChannel channel = (RPCClientChannel) future.channel();
-//        channel.writeAndFlush(null);
-        System.out.println("args:" + JsonUtils.toJson(args));
-        System.out.println("clazz:" + clazz.getName());
-//        return methodProxy.invokeSuper(obj, args);
-        try(RPCNettyClient client = new RPCNettyClient();){
-            return client.invoke(method,args);
+        logger.debug(String.format("args:%s \n clazz:%s", JsonUtils.toJson(args), clazz.getName()));
+        try (RPCNettyClient client = new RPCNettyClient();) {
+            return client.invoke(method, args);
         }
-//        return JsonUtils.toBean("", method.getReturnType());
     }
 
     /**
@@ -162,7 +155,7 @@ public class ServiceProxy implements MethodInterceptor {
             RPCClientChannel channel = (RPCClientChannel) this.future.channel();
             channel.reset();
             channel.writeAndFlush(request);
-            RPCResponse response = channel.get(1000000);
+            RPCResponse response = channel.get(CommonConstants.DEFAULT_CONNECTION_TIMEOUT);
             RPCHeader responseHeader = response.getHeader();
             if (responseHeader.getStatusCode() != CommonConstants.SUCCESS_CODE) {
                 RPCResponseBody body = (RPCResponseBody) response.getBody();
