@@ -30,6 +30,7 @@ import org.springframework.beans.BeanUtils;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 
 /**
  * 服务类服务器
@@ -119,17 +120,32 @@ public class ServiceServer extends AbstractServer {
             if (service == null) {
                 throw new RPCServerRuntimeException(CommonConstants.ErrorCode.ERR_UNKNOWN_SERVICE, String.format("未知的服务:%s", serviceName));
             }
-            //执行服务方法
-            Object result = service.invoke(body.getMethod(), body.getArgs().toArray());
-            if (result == null || result instanceof Serializable) {
+            try {
+                //执行服务方法
+                Object result = service.invoke(body.getMethod(), body.getArgs().toArray());
                 response.getHeader().setStatusCode(CommonConstants.SUCCESS_CODE);
                 RPCResponseBody responseBody = new RPCResponseBody();
                 responseBody.setResult((Serializable) result);
                 response.setResponseBody(responseBody);
+            } catch (Throwable throwable) {
+                logger.error("RPC服务异常", throwable);
+                //返回异信息
+                RPCHeader header = new RPCHeader();
+                if (throwable instanceof RPCServerRuntimeException) {
+                    header.setStatusCode(((RPCServerRuntimeException) throwable).getErrorCode());
+                } else if (throwable instanceof RPCServerException) {
+                    header.setStatusCode(((RPCServerException) throwable).getErrorCode());
+                } else {
+                    header.setStatusCode(DefaultErrorCode.SystemException.getErrCode());
+                }
+                header.setType(CommonConstants.RESPONSE_MESSAGE_TYPE);
+                response.setHeader(header);
+                RPCResponseBody responseBody = new RPCResponseBody();
+                responseBody.setResult(throwable);
+                response.setResponseBody(responseBody);
                 ctx.writeAndFlush(response);
-            } else {
-                throw new RPCServerRuntimeException("返回参数不支持序列化");
             }
+            ctx.writeAndFlush(response);
         }
 
         /**
@@ -175,22 +191,6 @@ public class ServiceServer extends AbstractServer {
             //关闭连接
             ctx.close();
             logger.error("RPC服务异常", cause);
-            //返回异信息
-            RPCResponse response = new RPCResponse();
-            RPCHeader header = new RPCHeader();
-            if (cause instanceof RPCServerRuntimeException) {
-                header.setStatusCode(((RPCServerRuntimeException) cause).getErrorCode());
-            } else if (cause instanceof RPCServerException) {
-                header.setStatusCode(((RPCServerException) cause).getErrorCode());
-            } else {
-                header.setStatusCode(DefaultErrorCode.SystemException.getErrCode());
-            }
-            header.setType(CommonConstants.RESPONSE_MESSAGE_TYPE);
-            response.setHeader(header);
-            RPCResponseBody body = new RPCResponseBody();
-            body.setResult(cause);
-            response.setResponseBody(body);
-            ctx.writeAndFlush(response);
         }
     }
 

@@ -18,5 +18,11 @@ public class ClientDemo {
 
     public void sayHello() {
         System.out.println(demoService.say("Jack"));
+        String[] towns = demoService.queryTowns();
+        for (String town:towns){
+            System.out.println(town);
+        }
+        System.out.println(demoService.test());
+        demoService.hi();
     }
 }

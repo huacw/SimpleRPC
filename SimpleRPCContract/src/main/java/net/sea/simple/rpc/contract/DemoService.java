@@ -1,5 +1,8 @@
 package net.sea.simple.rpc.contract;
 
+import java.util.List;
+import java.util.Map;
+
 /**
  * @author chengwu.hua
  * @Date 2018/4/20 14:42
@@ -7,4 +10,7 @@ package net.sea.simple.rpc.contract;
  */
 public interface DemoService {
     public String say(String name);
+    public String[] queryTowns();
+    public Map<String,String> test();
+    public void hi();
 }
