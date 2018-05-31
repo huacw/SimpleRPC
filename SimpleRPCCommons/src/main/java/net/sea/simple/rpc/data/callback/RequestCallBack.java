@@ -21,7 +21,8 @@ public class RequestCallBack extends Callback {
             throws RPCServerException {
         RPCRequest request = (RPCRequest) message;
 //		request.setRequestBody(marshallingDecoder.decode(buf));
-        request.setRequestBody(XStreamUtil.xmlToBean(ByteBufUtils.readString(buf), RPCRequestBody.class));
+//      request.setRequestBody(XStreamUtil.xmlToBean(ByteBufUtils.readString(buf), RPCRequestBody.class));
+        request.setRequestBody(XStreamUtil.xmlToBean(marshallingDecoder.decode(buf), RPCRequestBody.class));
     }
 
     @Override

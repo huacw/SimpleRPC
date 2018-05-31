@@ -51,7 +51,8 @@ public final class RPCMessageEncoder extends MessageToByteEncoder<RPCMessage> {
         if (msg.getBody() != null) {
             //marshallingEncoder.encode(msg.getBody(), sendBuf);
             //使用xml格式数据传输
-            ByteBufUtils.writeString(sendBuf, XStreamUtil.beanToXml(msg.getBody()));
+            //ByteBufUtils.writeString(sendBuf, XStreamUtil.beanToXml(msg.getBody()));
+            marshallingEncoder.encode(XStreamUtil.beanToXml(msg.getBody()), sendBuf);
         } else {
             sendBuf.writeInt(0);
         }
