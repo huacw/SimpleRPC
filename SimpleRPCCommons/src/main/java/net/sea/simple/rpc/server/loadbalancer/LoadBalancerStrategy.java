@@ -11,12 +11,12 @@ import net.sea.simple.rpc.server.loadbalancer.context.LoadBalancerContext;
  * @Version 1.0
  */
 @FunctionalInterface
-public interface LoadBalancerStrategy {
+public interface LoadBalancerStrategy<T extends LoadBalancerContext> {
     /**
      * 选择服务节点
      *
      * @param context
      * @return
      */
-    public ServiceInfo choose(LoadBalancerContext context);
+    public ServiceInfo choose(T context);
 }

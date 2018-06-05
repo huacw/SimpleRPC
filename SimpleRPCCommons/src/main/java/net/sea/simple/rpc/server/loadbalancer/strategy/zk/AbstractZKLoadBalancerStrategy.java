@@ -22,10 +22,9 @@ import java.util.List;
  * @Date 2018/4/25 15:45
  * @Version 1.0
  */
-public abstract class AbstractZKLoadBalancerStrategy implements LoadBalancerStrategy {
+public abstract class AbstractZKLoadBalancerStrategy implements LoadBalancerStrategy<ZKLoadBalancerContext> {
     @Override
-    public ServiceInfo choose(LoadBalancerContext context) {
-        ZKLoadBalancerContext ctx = (ZKLoadBalancerContext) context;
+    public ServiceInfo choose(ZKLoadBalancerContext ctx) {
         ServiceInfo service = ctx.getService();
         ZkClient client = ctx.getZkClient();
         if (!ZKUtils.hasNode(client, service)) {
