@@ -7,16 +7,32 @@ import com.thoughtworks.xstream.security.AnyTypePermission;
 
 public class XStreamUtil {
     private static String XML_TAG = "<?xml version='1.0' encoding='UTF-8'?>";
+    private static XStream xStream;
 
-    private XStreamUtil() {}
+    private XStreamUtil() {
+    }
 
     /**
      * 获取xstream实例
-     * 
+     *
      * @return
      */
-    private static XStream getInstance() {
-        XStream xStream = new XStream(new DomDriver("UTF-8")) {
+    private synchronized static XStream getInstance() {
+        if (xStream == null) {
+            synchronized (XStreamUtil.class) {
+                if (xStream == null) {
+                    newXStream();
+                }
+            }
+        }
+        return xStream;
+    }
+
+    /**
+     * 创建XStream对象
+     */
+    private static void newXStream() {
+        xStream = new XStream(new DomDriver("UTF-8")) {
             @Override
             protected MapperWrapper wrapMapper(MapperWrapper next) {
                 return new MapperWrapper(next) {
@@ -41,12 +57,11 @@ public class XStreamUtil {
         xStream.setClassLoader(XStreamUtil.class.getClassLoader());
         // 允许所有的类进行转换
         xStream.addPermission(AnyTypePermission.ANY);
-        return xStream;
     }
 
     /**
      * xml转换为对象
-     * 
+     *
      * @param xml
      * @param clazz
      * @return
@@ -62,7 +77,7 @@ public class XStreamUtil {
 
     /**
      * 对象转换为xml
-     * 
+     *
      * @param obj
      * @return
      */
@@ -78,7 +93,7 @@ public class XStreamUtil {
 
     /**
      * 对象转换为xml（包含xml头部信息）
-     * 
+     *
      * @param obj
      * @return
      */
