@@ -1,7 +1,5 @@
 package net.sea.simple.rpc.server.service;
 
-import net.sea.simple.rpc.server.annotation.RPCService;
-
 /**
  * @author chengwu.hua
  * @Date 2018/4/20 14:42

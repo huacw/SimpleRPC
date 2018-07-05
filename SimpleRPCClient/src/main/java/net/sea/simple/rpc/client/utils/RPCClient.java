@@ -15,6 +15,7 @@ public final class RPCClient {
      * @param clazz   服务的类名
      * @return 服务对象实体
      */
+    @SuppressWarnings("unchecked")
     public static <T> T get(String appName, Class<T> clazz) {
         return (T)ServiceProxy.newProxy(appName, clazz).newServiceProxy();
     }

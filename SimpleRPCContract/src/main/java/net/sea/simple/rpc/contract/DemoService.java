@@ -1,6 +1,5 @@
 package net.sea.simple.rpc.contract;
 
-import java.util.List;
 import java.util.Map;
 
 /**

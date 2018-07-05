@@ -1,6 +1,5 @@
 package net.sea.simple.rpc.server.test.service.impl;
 
-import net.sea.simple.rpc.server.annotation.RPCService;
 import net.sea.simple.rpc.server.test.service.IDemoService;
 
 /**
