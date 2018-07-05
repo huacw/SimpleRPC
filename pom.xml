@@ -13,6 +13,8 @@
         <module>SimpleRPCClient</module>
         <module>SimpleRPCTests</module>
         <module>SimpleRPCContract</module>
+        <module>SimpleRPCClientTest</module>
+        <module>SimpleRPCServerTest</module>
     </modules>
     <packaging>pom</packaging>
     <name>SimpleRPC</name>
@@ -34,16 +36,16 @@
             <version>4.1.16.Final</version>
         </dependency>
         <dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter</artifactId>
-			<version>1.5.9.RELEASE</version>
-			<exclusions>
-				<exclusion>
-					<groupId>ch.qos.logback</groupId>
-					<artifactId>logback-classic</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>1.5.9.RELEASE</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
     </dependencies>
 
 </project>

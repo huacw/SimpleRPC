@@ -28,6 +28,7 @@ import net.sea.simple.rpc.utils.SpringUtils;
 import net.sf.cglib.proxy.Enhancer;
 import net.sf.cglib.proxy.MethodInterceptor;
 import net.sf.cglib.proxy.MethodProxy;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
 import java.io.Closeable;
@@ -49,7 +50,8 @@ public class ServiceProxy implements MethodInterceptor {
     private Logger logger = Logger.getLogger(getClass());
     private Enhancer enhancer = new Enhancer();
     private Class<?> clazz;
-    private RPCClient client;
+    //    private RPCClient client;
+    private String appName;
     private static ConcurrentMap<Class<?>, Object> cache = new ConcurrentHashMap<>();
     private static ConcurrentMap<Class<?>, ServiceProxy> proxyCache = new ConcurrentHashMap<>();
 
@@ -69,7 +71,30 @@ public class ServiceProxy implements MethodInterceptor {
         if (serviceProxy == null) {
             serviceProxy = new ServiceProxy();
             serviceProxy.clazz = clazz;
-            serviceProxy.client = client;
+            serviceProxy.appName = client.appName();
+            proxyCache.putIfAbsent(clazz, serviceProxy);
+        }
+        return serviceProxy;
+    }
+
+    /**
+     * 创建代理实例
+     *
+     * @param appName 服务名
+     * @param clazz   服务接口
+     * @return
+     */
+    public static synchronized ServiceProxy newProxy(String appName, Class<?> clazz) {
+        ServiceProxy serviceProxy = null;
+        serviceProxy = proxyCache.get(clazz);
+        if (serviceProxy == null) {
+            serviceProxy = new ServiceProxy();
+            serviceProxy.clazz = clazz;
+            if (StringUtils.isNoneBlank(appName)) {
+                serviceProxy.appName = appName;
+            } else {
+                serviceProxy.appName = clazz.getPackage().getName();
+            }
             proxyCache.putIfAbsent(clazz, serviceProxy);
         }
         return serviceProxy;
@@ -118,7 +143,7 @@ public class ServiceProxy implements MethodInterceptor {
 
         private void initClient() throws InterruptedException {
             ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
-            serviceInfo = serviceRegister.findService(client.appName());
+            serviceInfo = serviceRegister.findService(appName);
             logger.info(String.format("获取的服务信息：%s", serviceInfo.toString()));
 
             //打开远程连接
