@@ -9,6 +9,7 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<artifactId>net.sea.simpl.rpc.commons</artifactId>
+	<name>SimpleRPCCommons</name>
 
 	<properties>
 		<spring.verion>4.3.13.RELEASE</spring.verion>

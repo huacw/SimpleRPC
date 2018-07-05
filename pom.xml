@@ -15,6 +15,7 @@
         <module>SimpleRPCContract</module>
     </modules>
     <packaging>pom</packaging>
+    <name>SimpleRPC</name>
 
     <properties>
         <junit.version>4.12</junit.version>
