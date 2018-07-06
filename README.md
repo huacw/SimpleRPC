@@ -1,2 +1,3 @@
 # SimpleRPC
 简单RPC项目
+基于nettye4实现的rpc框架，数据格式为xml格式。使用xstream实现xml与java对象的转换，通过Jboss Marshaller序列化实现数据传输。使用xml转换对象屏蔽了Jboss Marshaller传输时要求实现Serializable接口的问题。注册中心使用zookeeper实现，服务默认1s与注册中心进行心跳连接。
