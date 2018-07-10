@@ -41,6 +41,10 @@ public interface CommonConstants {
      */
     public int DEFAULT_CONNECTION_TIMEOUT = 3000;
     /**
+     * 默认RPC客户端的连接超时时间
+     */
+    public int DEFAULT_CLIENT_CONNECTION_TIMEOUT = 60;
+    /**
      * RPC注册中心根节点
      */
     public String ROOT_PATH = "/rpc/services/v_%s/";

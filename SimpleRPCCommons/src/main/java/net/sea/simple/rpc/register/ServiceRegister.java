@@ -55,7 +55,20 @@ public class ServiceRegister {
          * 初始化方法
          */
         private void init() {
+            checkConfig(config);
             client = new ZkClient(config.getZkServers(), config.getSessionTimeout(), config.getConnetionTimeout());
+        }
+
+        /**
+         * 检查配置
+         *
+         * @param config
+         */
+        private void checkConfig(RegisterCenterConfig config) {
+            if (config == null || StringUtils.isBlank(config.getZkServers())) {
+                throw new RPCServerRuntimeException(String.format("【\n%s\n】配置缺失",
+                                                                  "register.center.config.zkServers或\nregister:\n\tcenter:\n\t\tconfig:\n\t\t\tzkServers"));
+            }
         }
 
         /**

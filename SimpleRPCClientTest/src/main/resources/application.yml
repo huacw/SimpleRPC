@@ -2,10 +2,10 @@ register:
   center:
     config:
       zkServers: bidev191:2181
-rpc:
-  server:
-    config:
-      serviceName: net.sea.demo.service
-#      serviceIp: 192.168.4.119
-      port: 2001
-      opened: true
+#rpc:
+#  server:
+#    config:
+#      serviceName: net.sea.demo.service
+##      serviceIp: 192.168.4.119
+#      port: 2001
+#      opened: true
