@@ -22,5 +22,10 @@
 			<artifactId>cglib</artifactId>
 			<version>3.2.5</version>
 		</dependency>
+		<dependency>
+			<groupId>io.netty</groupId>
+			<artifactId>netty-all</artifactId>
+			<version>${nttety.version}</version>
+		</dependency>
 	</dependencies>
 </project>

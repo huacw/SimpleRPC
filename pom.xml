@@ -25,6 +25,7 @@
     <properties>
         <junit.version>4.12</junit.version>
         <spring.boot.version>1.5.14.RELEASE</spring.boot.version>
+        <nttety.version>4.1.16.Final</nttety.version>
         <!--<spring.boot.version>2.0.3.RELEASE</spring.boot.version>-->
     </properties>
 
@@ -34,11 +35,6 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>io.netty</groupId>
-            <artifactId>netty-all</artifactId>
-            <version>4.1.16.Final</version>
         </dependency>
     </dependencies>
 
