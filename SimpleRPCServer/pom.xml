@@ -17,10 +17,5 @@
 			<artifactId>net.sea.simpl.rpc.commons</artifactId>
 			<version>1.0-SNAPSHOT</version>
 		</dependency>
-		<dependency>
-			<groupId>io.netty</groupId>
-			<artifactId>netty-all</artifactId>
-			<version>${nttety.version}</version>
-		</dependency>
 	</dependencies>
 </project>
