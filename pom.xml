@@ -15,12 +15,17 @@
         <module>SimpleRPCContract</module>
         <module>SimpleRPCClientTest</module>
         <module>SimpleRPCServerTest</module>
+        <module>SimpleRPCRegisterCenter</module>
+        <module>SimpleRPCZKRegisterCenter</module>
+        <module>SimpleRPCEtcdRegisterCenter</module>
     </modules>
     <packaging>pom</packaging>
     <name>SimpleRPC</name>
 
     <properties>
         <junit.version>4.12</junit.version>
+        <spring.boot.version>1.5.14.RELEASE</spring.boot.version>
+        <!--<spring.boot.version>2.0.3.RELEASE</spring.boot.version>-->
     </properties>
 
     <dependencies>
@@ -34,17 +39,6 @@
             <groupId>io.netty</groupId>
             <artifactId>netty-all</artifactId>
             <version>4.1.16.Final</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-            <version>1.5.9.RELEASE</version>
-            <exclusions>
-                <exclusion>
-                    <groupId>ch.qos.logback</groupId>
-                    <artifactId>logback-classic</artifactId>
-                </exclusion>
-            </exclusions>
         </dependency>
     </dependencies>
 

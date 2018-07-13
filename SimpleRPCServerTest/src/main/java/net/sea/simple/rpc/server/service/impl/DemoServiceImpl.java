@@ -1,6 +1,7 @@
 package net.sea.simple.rpc.server.service.impl;
 
 import net.sea.simple.rpc.contract.DemoService;
+import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 import net.sea.simple.rpc.server.annotation.RPCService;
 
 import java.util.HashMap;
@@ -35,6 +36,6 @@ public class DemoServiceImpl implements DemoService {
     @Override
     public void hi() {
         System.out.println("hi system out");
-//        throw new RPCServerRuntimeException("test");
+        throw new RPCServerRuntimeException("test");
     }
 }

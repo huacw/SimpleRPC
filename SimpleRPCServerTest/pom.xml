@@ -19,6 +19,11 @@
     </properties>
     <dependencies>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+            <version>${spring.boot.version}</version>
+        </dependency>
+        <dependency>
             <groupId>net.sea.simple.rpc</groupId>
             <artifactId>net.sea.simple.rpc.server</artifactId>
             <version>1.0-SNAPSHOT</version>
