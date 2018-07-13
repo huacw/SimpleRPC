@@ -6,7 +6,7 @@ import net.sea.simple.rpc.server.utils.RPCCache;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * @author chengwu.hua
+ * @author sea
  * @Date 2018/7/5 15:34
  * @Version 1.0
  */

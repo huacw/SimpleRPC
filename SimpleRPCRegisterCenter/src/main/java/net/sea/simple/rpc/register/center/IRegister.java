@@ -1,4 +1,4 @@
-package net.sea.simple.rpc.register;
+package net.sea.simple.rpc.register.center;
 
 import net.sea.simple.rpc.server.ServiceInfo;
 

@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>net.sea.simple.rpc</artifactId>
 		<groupId>net.sea.simple.rpc</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
@@ -14,8 +14,8 @@
 	<dependencies>
 		<dependency>
 			<groupId>net.sea.simple.rpc</groupId>
-			<artifactId>net.sea.simpl.rpc.commons</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<artifactId>net.sea.simple.rpc.commons</artifactId>
+			<version>1.0.0-SNAPSHOT</version>
 		</dependency>
 	</dependencies>
 </project>

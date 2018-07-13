@@ -37,6 +37,10 @@ public interface CommonConstants {
      */
     public int DEFAULT_HEART_TIMEOUT = 3000;
     /**
+     * 默认的注册中心类型
+     */
+    public String DEFAULT_REGISTER_CENTER_TYPE = "zk";
+    /**
      * 默认的连接超时时间
      */
     public int DEFAULT_CONNECTION_TIMEOUT = 3000;

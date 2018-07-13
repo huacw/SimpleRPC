@@ -7,16 +7,10 @@
     <parent>
         <groupId>net.sea.simple.rpc</groupId>
         <artifactId>net.sea.simple.rpc</artifactId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <groupId>net.sea.simple.rpc.register.center.zk</groupId>
     <artifactId>net.sea.simple.rpc.register.center.zk</artifactId>
-    <version>1.0-SNAPSHOT</version>
     <name>SimpleRPCZKRegisterCenter</name>
-    <url>http://maven.apache.org</url>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
     <dependencies>
     </dependencies>
 </project>

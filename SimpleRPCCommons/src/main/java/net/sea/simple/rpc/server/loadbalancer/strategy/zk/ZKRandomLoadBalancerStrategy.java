@@ -6,7 +6,7 @@ import java.util.Random;
 /**
  * 随机策略
  *
- * @author chengwu.hua
+ * @author sea
  * @Date 2018/4/25 15:45
  * @Version 1.0
  */

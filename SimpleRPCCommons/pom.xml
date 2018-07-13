@@ -4,17 +4,13 @@
 	<parent>
 		<artifactId>net.sea.simple.rpc</artifactId>
 		<groupId>net.sea.simple.rpc</groupId>
-		<version>1.0-SNAPSHOT</version>
+		<version>1.0.0-SNAPSHOT</version>
 	</parent>
 	<modelVersion>4.0.0</modelVersion>
 
-	<artifactId>net.sea.simpl.rpc.commons</artifactId>
+	<artifactId>net.sea.simple.rpc.commons</artifactId>
 	<name>SimpleRPCCommons</name>
 
-	<properties>
-		<spring.verion>4.3.13.RELEASE</spring.verion>
-		<marshalling.verion>2.0.2.Final</marshalling.verion>
-	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>io.netty</groupId>

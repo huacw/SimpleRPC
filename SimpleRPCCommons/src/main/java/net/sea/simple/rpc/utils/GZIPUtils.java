@@ -12,7 +12,7 @@ import java.util.zip.GZIPOutputStream;
 /**
  * 字符串压缩与解压缩
  *
- * @author chengwu.hua
+ * @author sea
  * @Date 2018/5/7 13:32
  * @Version 1.0
  */

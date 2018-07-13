@@ -4,7 +4,7 @@ import net.sea.simple.rpc.server.annotation.RPCService;
 import net.sea.simple.rpc.server.service.DemoService;
 
 /**
- * @author chengwu.hua
+ * @author sea
  * @Date 2018/4/20 14:51
  * @Version 1.0
  */

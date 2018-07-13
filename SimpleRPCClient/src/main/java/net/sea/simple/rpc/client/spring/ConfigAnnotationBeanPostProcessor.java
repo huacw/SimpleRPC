@@ -14,7 +14,7 @@ import net.sea.simple.rpc.client.proxy.ServiceProxy;
 import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 
 /**
- * @author chengwu.hua
+ * @author sea
  * @Date 2018/4/24 14:14
  * @Version 1.0
  */

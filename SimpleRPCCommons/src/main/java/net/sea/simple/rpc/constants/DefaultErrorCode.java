@@ -3,7 +3,7 @@ package net.sea.simple.rpc.constants;
 /**
  * 系统默认错误码
  *
- * @author chengwu.hua
+ * @author sea
  * @Date 2018/4/25 14:03
  * @Version 1.0
  */
