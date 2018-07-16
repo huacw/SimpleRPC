@@ -55,7 +55,6 @@ public class ServiceProxy implements MethodInterceptor {
     private String appName;
     private static ConcurrentMap<Class<?>, Object> cache = new ConcurrentHashMap<>();
     private static ConcurrentMap<Class<?>, ServiceProxy> proxyCache = new ConcurrentHashMap<>();
-    private ClientConfig clientConfig;
 
     private ServiceProxy() {
     }
@@ -125,32 +124,8 @@ public class ServiceProxy implements MethodInterceptor {
     @Override
     public Object intercept(Object obj, Method method, Object[] args, MethodProxy methodProxy) throws Throwable {
         logger.debug(String.format("args:%s \n clazz:%s", JsonUtils.toJson(args), clazz.getName()));
-        clientConfig = SpringUtils.getBean(ClientConfig.class);
-        ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
-        ServiceInfo serviceInfo = serviceRegister.findService(appName);
-        return execute(serviceInfo, method, args, 1, clientConfig.isRetryEnable() ? clientConfig.getRetryCount() : 1);
-    }
-
-    /**
-     * 调用rpc方法,单节点带重试
-     *
-     * @param serviceInfo     服务信息
-     * @param method          rpc方法
-     * @param args            方法参数
-     * @param retryCount      当前重试次数
-     * @param totalRetryCount 总重试次数
-     * @return rpc方法的返回结果
-     * @throws Throwable
-     */
-    public Object execute(ServiceInfo serviceInfo, Method method, Object[] args, int retryCount, int totalRetryCount) throws Throwable {
-        try (RPCNettyClient client = new RPCNettyClient(serviceInfo);) {
+        try (RPCNettyClient client = new RPCNettyClient();) {
             return client.invoke(method, args);
-        } catch (Throwable e) {
-            if (retryCount > totalRetryCount) {
-                return execute(serviceInfo, method, args, retryCount + 1, totalRetryCount);
-            } else {
-                throw e;
-            }
         }
     }
 
@@ -164,13 +139,13 @@ public class ServiceProxy implements MethodInterceptor {
         private EventLoopGroup group;
         private ServiceInfo serviceInfo;
 
-        public RPCNettyClient(ServiceInfo serviceInfo) throws InterruptedException {
+        public RPCNettyClient() throws InterruptedException {
             initClient();
-            this.serviceInfo = serviceInfo;
-            logger.info(String.format("获取的服务信息：%s", this.serviceInfo.toString()));
         }
 
         private void initClient() throws InterruptedException {
+            ClientConfig clientConfig = SpringUtils.getBean(ClientConfig.class);
+
             //打开远程连接
             group = new NioEventLoopGroup();
             Bootstrap bootstrap = new Bootstrap();
@@ -199,6 +174,9 @@ public class ServiceProxy implements MethodInterceptor {
          * @throws InterruptedException
          */
         private void connectRPCServer(Bootstrap bootstrap) throws InterruptedException {
+            ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
+            serviceInfo = serviceRegister.findService(appName);
+            logger.info(String.format("获取的服务信息：%s", serviceInfo.toString()));
             this.future = bootstrap.connect(serviceInfo.getHost(), serviceInfo.getPort()).sync();
         }
 

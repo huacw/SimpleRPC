@@ -49,14 +49,6 @@ public interface CommonConstants {
      */
     public int DEFAULT_CLIENT_CONNECTION_TIMEOUT = 60;
     /**
-     * 默认RPC客户端的重试次数
-     */
-    public int DEFAULT_CLIENT_RETRY_COUNT = 3;
-    /**
-     * 默认RPC客户端的重试是否开启
-     */
-    public boolean DEFAULT_CLIENT_RETRY_ENABLE = true;
-    /**
      * RPC注册中心根节点
      */
     public String ROOT_PATH = "/rpc/services/v_%s/";
