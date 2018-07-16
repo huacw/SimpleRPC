@@ -1,7 +1,7 @@
 package net.sea.simple.rpc.register.center.loadbalancer.strategy;
 
+import net.sea.simple.rpc.register.center.loadbalancer.context.LoadBalancerContext;
 import net.sea.simple.rpc.server.ServiceInfo;
-import net.sea.simple.rpc.server.loadbalancer.context.LoadBalancerContext;
 
 /**
  * 负载均衡策略

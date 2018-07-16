@@ -10,16 +10,12 @@ import org.springframework.stereotype.Component;
  * @author sea
  */
 public abstract class RegisterCenterConfig {
-    private String registerCenterType = CommonConstants.DEFAULT_REGISTER_CENTER_TYPE;// 注册中心类型
+    protected String registerCenterType = CommonConstants.DEFAULT_REGISTER_CENTER_TYPE;// 注册中心类型
     private int sessionTimeout = CommonConstants.DEFAULT_HEART_TIMEOUT;// 会话超时时间
     private int connectionTimeout = CommonConstants.DEFAULT_CONNECTION_TIMEOUT;// 连接超时时间
 
     public String getRegisterCenterType() {
         return registerCenterType;
-    }
-
-    public void setRegisterCenterType(String registerCenterType) {
-        this.registerCenterType = registerCenterType;
     }
 
     public int getSessionTimeout() {

@@ -1,5 +1,7 @@
 package net.sea.simple.rpc.register.center;
 
+import net.sea.simple.rpc.exception.RPCServerRuntimeException;
+import net.sea.simple.rpc.register.center.config.RegisterCenterConfig;
 import net.sea.simple.rpc.server.ServiceInfo;
 
 /**
@@ -10,6 +12,13 @@ import net.sea.simple.rpc.server.ServiceInfo;
  * @Version 1.0
  */
 public interface IRegister {
+    /**
+     * 获取注册器名称
+     *
+     * @return
+     */
+    public String getRegisterName();
+
     /**
      * 添加服务节点
      *
