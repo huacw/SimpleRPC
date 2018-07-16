@@ -58,5 +58,13 @@ public interface IRegister {
      * @return
      */
     public boolean hasNode(ServiceInfo service);
+
+    /**
+     * 是否还有可用服务节点
+     *
+     * @param serviceName
+     * @return
+     */
+    public boolean hasNextServiceNode(String serviceName);
 }
 

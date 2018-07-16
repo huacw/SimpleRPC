@@ -5,6 +5,8 @@ import org.net.sea.simple.rpc.register.center.zk.constants.ZKConstants;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Component;
 @Configuration
 @ConfigurationProperties(prefix = "register.center.config.zk")
 @Profile("zk-reg-center")
+@Order(Ordered.LOWEST_PRECEDENCE)
 public class ZKRegisterCenterConfig extends RegisterCenterConfig {
     public ZKRegisterCenterConfig() {
         registerCenterType = ZKConstants.REGISTER_CENTER_TYPE;

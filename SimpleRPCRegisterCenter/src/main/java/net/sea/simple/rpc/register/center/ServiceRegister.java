@@ -156,4 +156,14 @@ public class ServiceRegister {
     public boolean hasService(ServiceInfo service) {
         return REG_INST.hasNode(service);
     }
+
+    /**
+     * 根据服务名称查询RPC服务还有可用几点
+     *
+     * @param serviceName
+     * @return
+     */
+    public boolean hasNextServiceNode(String serviceName) {
+        return REG_INST.hasNextServiceNode(serviceName);
+    }
 }

@@ -10,7 +10,6 @@ import net.sea.simple.rpc.server.ServiceInfo;
  * @Date 2018/4/25 15:24
  * @Version 1.0
  */
-@FunctionalInterface
 public interface LoadBalancerStrategy<T extends LoadBalancerContext> {
     /**
      * 选择服务节点
@@ -19,4 +18,12 @@ public interface LoadBalancerStrategy<T extends LoadBalancerContext> {
      * @return
      */
     public ServiceInfo choose(T context);
+
+    /**
+     * 是否还有下一个节点
+     *
+     * @param context
+     * @return
+     */
+    public boolean hasNextServiceNode(T context);
 }

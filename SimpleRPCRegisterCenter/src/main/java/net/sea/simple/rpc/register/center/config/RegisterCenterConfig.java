@@ -13,6 +13,7 @@ public abstract class RegisterCenterConfig {
     protected String registerCenterType = CommonConstants.DEFAULT_REGISTER_CENTER_TYPE;// 注册中心类型
     private int sessionTimeout = CommonConstants.DEFAULT_HEART_TIMEOUT;// 会话超时时间
     private int connectionTimeout = CommonConstants.DEFAULT_CONNECTION_TIMEOUT;// 连接超时时间
+    private String loadBalancer;//负载均衡策略
 
     public String getRegisterCenterType() {
         return registerCenterType;
@@ -32,6 +33,14 @@ public abstract class RegisterCenterConfig {
 
     public void setConnectionTimeout(int connectionTimeout) {
         this.connectionTimeout = connectionTimeout;
+    }
+
+    public String getLoadBalancer() {
+        return loadBalancer;
+    }
+
+    public void setLoadBalancer(String loadBalancer) {
+        this.loadBalancer = loadBalancer;
     }
 
     @Override
