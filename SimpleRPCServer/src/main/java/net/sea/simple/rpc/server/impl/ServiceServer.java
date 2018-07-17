@@ -62,8 +62,13 @@ public class ServiceServer extends AbstractServer {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         int port = config.getPort();
-        String host = HostUtils.getLocalIP();
-        config.setServiceIp(host);
+        String host;
+        if (StringUtils.isBlank(config.getServiceIp())) {
+            host = HostUtils.getLocalIP();
+            config.setServiceIp(host);
+        } else {
+            host = config.getServiceIp();
+        }
         try {
             ServerBootstrap b = new ServerBootstrap();
 
