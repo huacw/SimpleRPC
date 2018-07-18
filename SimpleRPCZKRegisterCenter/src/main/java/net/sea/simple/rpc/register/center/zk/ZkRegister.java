@@ -55,7 +55,8 @@ public class ZkRegister implements IRegister {
      * 初始化方法
      */
     private void init() {
-        config = (ZKRegisterCenterConfig)SpringUtils.getBean(RegisterCenterConfig.class);
+        config = (ZKRegisterCenterConfig) SpringUtils.getBean(RegisterCenterConfig.class);
+        logger.info("注册中心类型为：zookeeper");
         checkConfig(config);
         client = new ZkClient(config.getZkServers(), config.getSessionTimeout(), config.getConnectionTimeout());
     }

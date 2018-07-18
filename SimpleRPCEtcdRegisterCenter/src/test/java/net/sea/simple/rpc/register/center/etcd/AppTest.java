@@ -1,4 +1,4 @@
-package org.net.sea.simple.rpc.register.center.etcd;
+package net.sea.simple.rpc.register.center.etcd;
 
 import junit.framework.Test;
 import junit.framework.TestCase;

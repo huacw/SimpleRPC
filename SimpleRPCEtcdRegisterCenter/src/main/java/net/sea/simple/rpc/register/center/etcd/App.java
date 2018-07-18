@@ -1,4 +1,4 @@
-package org.net.sea.simple.rpc.register.center.etcd;
+package net.sea.simple.rpc.register.center.etcd;
 
 /**
  * Hello world!
