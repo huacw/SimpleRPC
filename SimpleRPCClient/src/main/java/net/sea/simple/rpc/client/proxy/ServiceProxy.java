@@ -19,8 +19,7 @@ import net.sea.simple.rpc.data.request.RPCRequestBody;
 import net.sea.simple.rpc.data.response.RPCResponse;
 import net.sea.simple.rpc.data.response.RPCResponseBody;
 import net.sea.simple.rpc.exception.RPCServerRuntimeException;
-import net.sea.simple.rpc.register.ServiceRegister;
-import net.sea.simple.rpc.server.RegisterCenterConfig;
+import net.sea.simple.rpc.register.center.ServiceRegister;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.ContextUtils;
 import net.sea.simple.rpc.utils.HostUtils;
@@ -174,7 +173,7 @@ public class ServiceProxy implements MethodInterceptor {
          * @throws InterruptedException
          */
         private void connectRPCServer(Bootstrap bootstrap) throws InterruptedException {
-            ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
+            ServiceRegister serviceRegister = ServiceRegister.newInstance();
             serviceInfo = serviceRegister.findService(appName);
             logger.info(String.format("获取的服务信息：%s", serviceInfo.toString()));
             this.future = bootstrap.connect(serviceInfo.getHost(), serviceInfo.getPort()).sync();

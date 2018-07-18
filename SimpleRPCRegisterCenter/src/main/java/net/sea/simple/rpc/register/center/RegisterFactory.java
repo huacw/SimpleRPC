@@ -17,7 +17,7 @@ import java.util.List;
  * @Date 2018/7/13 13:58
  * @Version 1.0
  */
-@Component
+//@Component
 class RegisterFactory {
     @Autowired
     private List<IRegister> registers;

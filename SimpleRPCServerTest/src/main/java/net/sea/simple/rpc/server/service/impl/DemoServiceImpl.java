@@ -36,6 +36,6 @@ public class DemoServiceImpl implements DemoService {
     @Override
     public void hi() {
         System.out.println("hi system out");
-        throw new RPCServerRuntimeException("test");
+//        throw new RPCServerRuntimeException("test");
     }
 }

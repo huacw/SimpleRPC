@@ -1,7 +1,8 @@
 register:
   center:
     config:
-      zkServers: bidev191:2181
+      zk:
+        zkServers: bidev191:2181
 #rpc:
 #  server:
 #    config:
@@ -9,3 +10,6 @@ register:
 ##      serviceIp: 192.168.4.119
 #      port: 2001
 #      opened: true
+spring:
+  profiles:
+    active: zk-reg-center

@@ -3,9 +3,9 @@ package net.sea.simple.rpc.server.impl;
 import net.sea.simple.rpc.constants.CommonConstants;
 import net.sea.simple.rpc.exception.RPCServerException;
 import net.sea.simple.rpc.exception.RPCServerRuntimeException;
-import net.sea.simple.rpc.register.ServiceRegister;
+import net.sea.simple.rpc.register.center.IRegister;
+import net.sea.simple.rpc.register.center.ServiceRegister;
 import net.sea.simple.rpc.server.IRPCServer;
-import net.sea.simple.rpc.server.RegisterCenterConfig;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.server.config.ServerConfig;
 import net.sea.simple.rpc.utils.HostUtils;
@@ -80,7 +80,8 @@ public abstract class AbstractServer implements IRPCServer {
                 return true;
             }
             // 注册服务
-            ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
+//            ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
+            ServiceRegister serviceRegister = ServiceRegister.newInstance();
             boolean result = serviceRegister.register(createServiceInfo(config));
             if (result) {//注册成功后开启心跳检测
                 startHeartbeat(config);
@@ -135,7 +136,7 @@ public abstract class AbstractServer implements IRPCServer {
                     logger.warn("心跳程序休眠异常", e);
                 }
                 //1s后重新注册服务
-                ServiceRegister serviceRegister = new ServiceRegister(SpringUtils.getBean(RegisterCenterConfig.class));
+                ServiceRegister serviceRegister = ServiceRegister.newInstance();
                 serviceRegister.registerAgain(createServiceInfo(config));
             }
         }).start();

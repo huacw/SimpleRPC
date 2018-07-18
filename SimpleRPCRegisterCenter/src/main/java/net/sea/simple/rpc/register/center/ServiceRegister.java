@@ -22,7 +22,7 @@ public class ServiceRegister {
     /**
      * 单例对象锁
      */
-    private static Object lock;
+    private static Object lock = new Object();
 
     private ServiceRegister() {
     }
@@ -37,7 +37,7 @@ public class ServiceRegister {
             synchronized (lock) {
                 if (serviceRegister == null) {
                     serviceRegister = new ServiceRegister();
-                    REG_INST = SpringUtils.getBean(RegisterFactory.class).newRegister();
+                    REG_INST = SpringUtils.getBean(IRegister.class);
                 }
             }
         }
