@@ -14,14 +14,13 @@ import net.sea.simple.rpc.register.center.zk.config.ZKRegisterCenterConfig;
 import net.sea.simple.rpc.register.center.zk.constants.ZKConstants;
 import net.sea.simple.rpc.register.center.zk.loadbalancer.context.ZKLoadBalancerContext;
 import net.sea.simple.rpc.register.center.zk.loadbalancer.strategy.ZKRoundLoadBalancerStrategy;
+import net.sea.simple.rpc.register.center.zk.utils.ZKUtils;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.JsonUtils;
 import net.sea.simple.rpc.utils.SpringUtils;
-import net.sea.simple.rpc.utils.ZKUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 

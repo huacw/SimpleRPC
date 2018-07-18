@@ -1,4 +1,4 @@
-package net.sea.simple.rpc.utils;
+package net.sea.simple.rpc.register.center.zk.utils;
 
 import com.github.zkclient.ZkClient;
 import net.sea.simple.rpc.constants.CommonConstants;
