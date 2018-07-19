@@ -61,9 +61,7 @@ public class ServiceMeta {
 
     @Override
     public String toString() {
-        return "ServiceMeta{" +
-                "serviceName='" + serviceName + '\'' +
-                ", methodMeta=" + methodMeta +
-                '}';
+        return new StringBuilder("ServiceMeta{serviceName='").append(serviceName).append("'").append(", methodMeta=").append(methodMeta).append("}")
+                .toString();
     }
 }

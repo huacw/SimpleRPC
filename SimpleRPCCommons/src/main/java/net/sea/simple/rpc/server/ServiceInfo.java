@@ -90,11 +90,14 @@ public class ServiceInfo {
 
     @Override
     public String toString() {
-        return "ServiceInfo{" +
-                "serviceName='" + serviceName + '\'' +
-                ", host='" + host + '\'' +
-                ", port=" + port +
-                ", version='" + version + '\'' +
-                '}';
+        StringBuilder info = new StringBuilder();
+        info.append("ServiceInfo{serviceName='").append(serviceName).append("'")
+                .append(", host='").append(host).append("'")
+                .append(", port=").append(port)
+                .append(", maxConnections=").append(maxConnections)
+                .append(", currentConnections=").append(currentConnections)
+                .append(", version='").append(version).append("'")
+                .append(", serviceType='").append(serviceType).append("'}");
+        return info.toString();
     }
 }

@@ -85,8 +85,6 @@ public class ServiceMethodMeta {
 
     @Override
     public String toString() {
-        return "ServiceMethodMeta{" +
-                "methodMappers=" + methodMappers +
-                '}';
+        return new StringBuilder("ServiceMethodMeta{methodMappers=").append(methodMappers).append("}").toString();
     }
 }
