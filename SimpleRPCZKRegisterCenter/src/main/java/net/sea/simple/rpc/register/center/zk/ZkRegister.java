@@ -36,7 +36,7 @@ import java.util.Map;
  * @Version 1.0
  */
 @Component
-@Profile(ZKConstants.REGISTER_CENTER_PROFLE)
+@Profile(ZKConstants.REGISTER_CENTER_PROFILE)
 public class ZkRegister implements IRegister {
     private Logger logger = Logger.getLogger(getClass());
     private ZKRegisterCenterConfig config;

@@ -49,10 +49,6 @@ public interface CommonConstants {
      */
     public int DEFAULT_CLIENT_CONNECTION_TIMEOUT = 60;
     /**
-     * RPC注册中心根节点
-     */
-    public String ROOT_PATH = "/rpc/services/v_%s/";
-    /**
      * 请求消息类型
      */
     public byte REQUEST_MESSAGE_TYPE = 1;

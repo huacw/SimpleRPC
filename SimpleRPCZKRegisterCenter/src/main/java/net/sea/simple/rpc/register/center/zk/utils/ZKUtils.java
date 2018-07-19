@@ -2,6 +2,7 @@ package net.sea.simple.rpc.register.center.zk.utils;
 
 import com.github.zkclient.ZkClient;
 import net.sea.simple.rpc.constants.CommonConstants;
+import net.sea.simple.rpc.register.center.zk.constants.ZKConstants;
 import net.sea.simple.rpc.server.ServiceInfo;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,6 +39,6 @@ public class ZKUtils {
      * @return
      */
     public static String getServiceNameNode(ServiceInfo service) {
-        return String.format(CommonConstants.ROOT_PATH.concat(service.getServiceName()), service.getVersion());
+        return String.format(ZKConstants.ROOT_PATH.concat(service.getServiceName()), service.getVersion());
     }
 }

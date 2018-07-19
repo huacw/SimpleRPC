@@ -18,5 +18,9 @@ public class ZKConstants {
     /**
      * 注册中心配置名称
      */
-    public static final String REGISTER_CENTER_PROFLE = "zk-reg-center";
+    public static final String REGISTER_CENTER_PROFILE = "zk-reg-center";
+    /**
+     * RPC注册中心根节点
+     */
+    public static final String ROOT_PATH = "/rpc/services/v_%s/";
 }
