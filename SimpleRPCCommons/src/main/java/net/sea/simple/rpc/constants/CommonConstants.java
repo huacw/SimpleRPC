@@ -33,7 +33,7 @@ public interface CommonConstants {
      */
     public Charset DEFAULT_CHARSET = Charset.forName(DEFAULT_CHARSET_STR);
     /**
-     * 默认的心跳超时时间
+     * 默认的心跳超时时间（3000ms）
      */
     public int DEFAULT_HEART_TIMEOUT = 3000;
     /**
@@ -41,13 +41,13 @@ public interface CommonConstants {
      */
     public String DEFAULT_REGISTER_CENTER_TYPE = "zk";
     /**
-     * 默认的连接超时时间
+     * 默认的连接超时时间（3000ms）
      */
     public int DEFAULT_CONNECTION_TIMEOUT = 3000;
     /**
-     * 默认RPC客户端的连接超时时间
+     * 默认RPC客户端的连接超时时间（5s）
      */
-    public int DEFAULT_CLIENT_CONNECTION_TIMEOUT = 60;
+    public int DEFAULT_CLIENT_CONNECTION_TIMEOUT = 5;
     /**
      * 请求消息类型
      */

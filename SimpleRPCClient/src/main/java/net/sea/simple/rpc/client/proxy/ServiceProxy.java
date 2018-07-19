@@ -137,6 +137,7 @@ public class ServiceProxy implements MethodInterceptor {
         private ChannelFuture future;
         private EventLoopGroup group;
         private ServiceInfo serviceInfo;
+        private long timeout;
 
         public RPCNettyClient() throws InterruptedException {
             initClient();
@@ -144,6 +145,7 @@ public class ServiceProxy implements MethodInterceptor {
 
         private void initClient() throws InterruptedException {
             ClientConfig clientConfig = SpringUtils.getBean(ClientConfig.class);
+            timeout = clientConfig.getConnectionTimeout() * 1000;
 
             //打开远程连接
             group = new NioEventLoopGroup();
@@ -279,13 +281,19 @@ public class ServiceProxy implements MethodInterceptor {
         public RPCResponse get(long timeout) throws InterruptedException {
             lock.lock();
             try {
-                long end = System.currentTimeMillis() + timeout;
-                long time = timeout;
+                long start = System.currentTimeMillis();
+                //在超时时间内取十次返回结果
+                long waitInterval = timeout / 10;
+                boolean timeoutFlag = false;
                 while (responseMessage == null) {
-                    boolean ok = hasMessage.await(time, TimeUnit.MILLISECONDS);
-                    if (ok || (time = end - System.currentTimeMillis()) <= 0) {
+                    boolean ok = hasMessage.await(waitInterval, TimeUnit.MILLISECONDS);
+                    timeoutFlag = System.currentTimeMillis() - start > timeout;
+                    if (ok || timeoutFlag) {
                         break;
                     }
+                }
+                if(timeoutFlag){
+                    throw new RPCServerRuntimeException("RPC服务调用超时，请重试！");
                 }
             } finally {
                 lock.unlock();

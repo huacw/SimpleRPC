@@ -42,8 +42,8 @@ public class HostUtils {
                     }
                 }
             }
-//            return CollectionUtils.isEmpty(result) ? defaultIP : result.get(0);
-            return "192.168.4.118";
+            return CollectionUtils.isEmpty(result) ? defaultIP : result.get(0);
+//            return "192.168.4.118";
         } catch (Exception e) {
             logger.error("获取本地IP异常", e);
             return defaultIP;
