@@ -4,6 +4,7 @@ import org.h2.mvstore.ConcurrentArrayList;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -20,6 +21,8 @@ public class RPCServiceCache {
     private Map<String, List<String>> SERVICE_CACHE = new ConcurrentHashMap<>();
     // 缓存对象
     private volatile static RPCServiceCache cache = null;
+    // 上下文
+    private Map<String, Object> localContainer = new HashMap<>();
 
     /**
      * 实例化缓存对象
@@ -99,5 +102,26 @@ public class RPCServiceCache {
      */
     public List<String> getCache(String serviceName) {
         return SERVICE_CACHE.get(serviceName);
+    }
+
+    /**
+     * 设置上下文属性
+     *
+     * @param key
+     * @param value
+     */
+    public void putAttr(String key, Object value) {
+        localContainer.put(key, value);
+    }
+
+    /**
+     * 获取属性值
+     *
+     * @param key
+     * @param <T>
+     * @return
+     */
+    public <T> T getAttr(String key) {
+        return (T) localContainer.get(key);
     }
 }

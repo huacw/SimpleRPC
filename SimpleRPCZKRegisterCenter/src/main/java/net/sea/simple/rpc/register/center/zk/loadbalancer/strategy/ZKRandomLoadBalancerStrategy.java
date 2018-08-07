@@ -1,5 +1,7 @@
 package net.sea.simple.rpc.register.center.zk.loadbalancer.strategy;
 
+import net.sea.simple.rpc.utils.RPCServiceCache;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
@@ -14,23 +16,25 @@ import java.util.Set;
  */
 public class ZKRandomLoadBalancerStrategy extends AbstractZKLoadBalancerStrategy {
     private static Random random = new Random();
-    private ThreadLocal<Set<String>> localContainer = new ThreadLocal<>();
+    private static final String CURRENT_NODES = "load_balancer_strategy_current_nodes";
+
 
     @Override
     protected synchronized String chooseNode(List<String> nodes) {
+        RPCServiceCache rpcServiceCache = RPCServiceCache.newCache();
         String node = nodes.get(random.nextInt(nodes.size()));
-        Set<String> nodeSet = localContainer.get();
+        Set<String> nodeSet = rpcServiceCache.getAttr(CURRENT_NODES);
         if (nodeSet == null) {
             nodeSet = new HashSet<>(16);
         }
         nodeSet.add(node);
-        localContainer.set(nodeSet);
+        rpcServiceCache.putAttr(CURRENT_NODES, nodeSet);
         return node;
     }
 
     @Override
     protected boolean isLastNode(List<String> nodes) {
-        nodes.removeAll(localContainer.get());
+        nodes.removeAll(RPCServiceCache.newCache().getAttr(CURRENT_NODES));
         return nodes.isEmpty();
     }
 }
