@@ -16,16 +16,19 @@ import java.util.Map;
 public class DemoServiceImpl implements DemoService {
     @Override
     public String say(String name) {
+        System.out.println("say");
         return "Hello," + name;
     }
 
     @Override
     public String[] queryTowns() {
+        System.out.println("queryTowns");
         return new String[]{"华西村1", "义乌", "同里", "周庄"};
     }
 
     @Override
     public Map<String, String> test() {
+        System.out.println("test");
         Map<String, String> map = new HashMap<>();
         map.put("key1","test1");
         map.put("key2","test2");

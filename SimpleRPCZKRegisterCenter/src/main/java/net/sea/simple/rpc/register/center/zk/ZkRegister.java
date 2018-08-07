@@ -17,16 +17,16 @@ import net.sea.simple.rpc.register.center.zk.loadbalancer.strategy.ZKRoundLoadBa
 import net.sea.simple.rpc.register.center.zk.utils.ZKUtils;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.JsonUtils;
+import net.sea.simple.rpc.utils.RPCServiceCache;
 import net.sea.simple.rpc.utils.SpringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.apache.zookeeper.Watcher.Event.KeeperState;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * zookeeper服务注册器
@@ -259,11 +259,9 @@ public class ZkRegister implements IRegister {
 
         @Override
         public void handleChildChange(String parentPath, List<String> currentChildren) throws Exception {
-            // TODO Auto-generated method stub
             System.out.println("parentPath = [" + parentPath + "], currentChildren = [" + currentChildren + "]");
-
+            RPCServiceCache.newCache().addCache(parentPath.substring(parentPath.lastIndexOf("/") + 1), currentChildren);
         }
-
     }
 
     /**

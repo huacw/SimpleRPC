@@ -8,6 +8,7 @@ import net.sea.simple.rpc.register.center.zk.loadbalancer.context.ZKLoadBalancer
 import net.sea.simple.rpc.register.center.zk.utils.ZKUtils;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.JsonUtils;
+import net.sea.simple.rpc.utils.RPCServiceCache;
 import org.springframework.util.CollectionUtils;
 
 import java.util.ArrayList;
@@ -45,7 +46,14 @@ public abstract class AbstractZKLoadBalancerStrategy implements LoadBalancerStra
      * @return
      */
     private String findServiceNodes(ZKLoadBalancerContext ctx, List<String> children) {
+        //从缓存中获取服务节点
         ServiceInfo service = ctx.getService();
+        List<String> cache = RPCServiceCache.newCache().getCache(service.getServiceName());
+        if (!CollectionUtils.isEmpty(cache)) {
+            children.addAll(cache);
+            return ZKUtils.getServiceNameNode(service);
+        }
+        //缓存中未发现服务时从注册中心读取
         ZkClient client = ctx.getZkClient();
         if (!ZKUtils.hasNode(client, service)) {
             throw new RPCServerRuntimeException(String.format("未找到服务：%s", service.getServiceName()));
@@ -55,6 +63,7 @@ public abstract class AbstractZKLoadBalancerStrategy implements LoadBalancerStra
         if (CollectionUtils.isEmpty(children)) {
             throw new RPCServerRuntimeException(String.format("服务：%s未找到节点", service.getServiceName()));
         }
+        RPCServiceCache.newCache().addCache(service.getServiceName(), children);
         return serviceNameNode;
     }
 

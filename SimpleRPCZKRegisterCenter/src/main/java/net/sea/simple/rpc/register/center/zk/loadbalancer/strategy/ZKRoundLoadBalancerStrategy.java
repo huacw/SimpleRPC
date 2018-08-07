@@ -14,20 +14,19 @@ public class ZKRoundLoadBalancerStrategy extends AbstractZKLoadBalancerStrategy 
 
     @Override
     protected synchronized String chooseNode(List<String> nodes) {
-        String node = nodes.remove(0);
-        nodes.add(nodes.size(), node);
         Integer index = localContainer.get();
         if (index == null) {
-            index = 1;
+            index = 0;
         } else {
             index++;
         }
+        index = index % nodes.size();
         localContainer.set(index);
-        return node;
+        return nodes.get(index);
     }
 
     @Override
     protected boolean isLastNode(List<String> nodes) {
-        return localContainer.get() == nodes.size();
+        return localContainer.get() == nodes.size() - 1;
     }
 }
