@@ -189,7 +189,7 @@ public class ZkRegister implements IRegister {
     }
 
     /**
-     * 获取负载均衡策略,默认为net.sea.simple.rpc.server.loadbalancer.strategy.zk.ZKRoundLoadBalancerStrategy（轮询策略）
+     * 获取负载均衡策略,默认为net.sea.simple.rpc.register.center.zk.loadbalancer.strategy.ZKRoundLoadBalancerStrategy（轮询策略）
      *
      * @return
      * @throws InstantiationException
