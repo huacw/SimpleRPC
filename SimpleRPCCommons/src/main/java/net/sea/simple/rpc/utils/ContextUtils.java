@@ -51,6 +51,15 @@ public class ContextUtils {
     }
 
     /**
+     * 设置下上文id
+     *
+     * @param sessionId
+     */
+    public void setContextId(String sessionId) {
+        localContainer.set(sessionId);
+    }
+
+    /**
      * 生成sessionId
      *
      * @return

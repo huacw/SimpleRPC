@@ -42,7 +42,10 @@ public abstract class Callback {
             header.setPriority(buf.readByte());
             header.setLocalHost(ByteBufUtils.readString(buf));
             header.setRemoteHost(ByteBufUtils.readString(buf));
-            header.setSessionId(ContextUtils.readSessionId(buf));
+            String sessionId = ContextUtils.readSessionId(buf);
+            header.setSessionId(sessionId);
+            //串联上下文id
+            ContextUtils.getContext().setContextId(sessionId);
             header.setExProperties(ByteBufUtils.readMap(buf));
             message.setHeader(header);
             if (buf.readableBytes() > 4) {
