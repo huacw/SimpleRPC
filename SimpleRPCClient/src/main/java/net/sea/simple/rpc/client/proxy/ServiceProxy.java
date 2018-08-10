@@ -1,19 +1,14 @@
 package net.sea.simple.rpc.client.proxy;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
-import io.netty.channel.nio.NioEventLoopGroup;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
-import io.netty.handler.logging.LogLevel;
-import io.netty.handler.logging.LoggingHandler;
-import io.netty.handler.timeout.ReadTimeoutHandler;
+import io.netty.channel.Channel;
 import net.sea.simple.rpc.client.annotation.RPCClient;
 import net.sea.simple.rpc.client.config.ClientConfig;
+import net.sea.simple.rpc.client.pool.ClientConnection;
+import net.sea.simple.rpc.client.pool.ClientConnectionPool;
+import net.sea.simple.rpc.client.pool.ClientConnectionPoolManager;
 import net.sea.simple.rpc.constants.CommonConstants;
 import net.sea.simple.rpc.data.RPCHeader;
-import net.sea.simple.rpc.data.codec.RPCMessageDecoder;
-import net.sea.simple.rpc.data.codec.RPCMessageEncoder;
 import net.sea.simple.rpc.data.request.RPCRequest;
 import net.sea.simple.rpc.data.request.RPCRequestBody;
 import net.sea.simple.rpc.data.response.RPCResponse;
@@ -37,9 +32,6 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * RPC服务代理类型
@@ -134,51 +126,22 @@ public class ServiceProxy implements MethodInterceptor {
      * @author sea
      */
     private class RPCNettyClient implements Closeable {
-        private ChannelFuture future;
-        private EventLoopGroup group;
         private ServiceInfo serviceInfo;
-        private long timeout;
+        private ClientConnectionPool pool;
+        private Channel channel;
 
         public RPCNettyClient() throws InterruptedException {
             initClient();
+
         }
 
         private void initClient() throws InterruptedException {
             ClientConfig clientConfig = SpringUtils.getBean(ClientConfig.class);
-            timeout = clientConfig.getConnectionTimeout() * 1000;
 
-            //打开远程连接
-            group = new NioEventLoopGroup();
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(group)
-                    .channel(RPCClientChannel.class)
-                    .option(ChannelOption.TCP_NODELAY, true)
-                    .handler(new LoggingHandler(LogLevel.INFO))
-                    .handler(new ChannelInitializer<SocketChannel>() {
-                        @Override
-                        protected void initChannel(SocketChannel ch) throws Exception {
-                            ch.pipeline()
-                                    .addLast("decoder", new RPCMessageDecoder(1024 * 1024, 4, 4))
-                                    .addLast("encoder", new RPCMessageEncoder())
-                                    .addLast("readTimeoutHandler", new ReadTimeoutHandler(clientConfig.getConnectionTimeout()))
-                                    .addLast("clientHandler", new ClientHandler());
-                        }
-                    });
-            //连接RPC服务端
-            connectRPCServer(bootstrap);
-        }
-
-        /**
-         * 连接RPC服务端
-         *
-         * @param bootstrap
-         * @throws InterruptedException
-         */
-        private void connectRPCServer(Bootstrap bootstrap) throws InterruptedException {
             ServiceRegister serviceRegister = ServiceRegister.newInstance();
             serviceInfo = serviceRegister.findService(appName);
             logger.info(String.format("获取的服务信息：%s", serviceInfo.toString()));
-            this.future = bootstrap.connect(serviceInfo.getHost(), serviceInfo.getPort()).sync();
+            pool = ClientConnectionPoolManager.getClientConnectionPool(serviceInfo.getHost(), serviceInfo.getPort(), clientConfig);
         }
 
         /**
@@ -192,10 +155,12 @@ public class ServiceProxy implements MethodInterceptor {
             RPCRequest request = new RPCRequest();
             request.setHeader(buildRpcHeader());
             request.setRequestBody(buildRpcBody(method, args));
-            RPCClientChannel channel = (RPCClientChannel) this.future.channel();
-            channel.reset();
-            channel.writeAndFlush(request);
-            RPCResponse response = channel.get(CommonConstants.DEFAULT_CONNECTION_TIMEOUT);
+//          RPCClientChannel channel = (RPCClientChannel) this.future.channel();
+            channel = pool.acquire(CommonConstants.DEFAULT_FETCH_CONNECTION_TIMEOUT);
+            ClientConnection.RPCClientChannel clientChannel = (ClientConnection.RPCClientChannel) channel;
+            clientChannel.reset();
+            clientChannel.writeAndFlush(request);
+            RPCResponse response = clientChannel.get(CommonConstants.DEFAULT_CONNECTION_TIMEOUT);
             RPCHeader responseHeader = response.getHeader();
             if (responseHeader.getStatusCode() != CommonConstants.SUCCESS_CODE) {
                 RPCResponseBody body = (RPCResponseBody) response.getBody();
@@ -241,75 +206,10 @@ public class ServiceProxy implements MethodInterceptor {
 
         @Override
         public void close() throws IOException {
-            this.future.channel().close();
-            this.group.shutdownGracefully();
-            logger.info("rpc客户端关闭");
+//            this.future.channel().close();
+//            this.group.shutdownGracefully();
+//            logger.info("rpc客户端关闭");
+            pool.release(channel);
         }
-    }
-
-    /**
-     * 客户端消息处理器
-     *
-     * @author sea
-     */
-    private class ClientHandler extends SimpleChannelInboundHandler<RPCResponse> {
-
-        @Override
-        protected void channelRead0(ChannelHandlerContext ctx, RPCResponse msg) throws Exception {
-            RPCClientChannel channel = (RPCClientChannel) ctx.channel();
-            channel.set(msg);
-        }
-    }
-
-    /**
-     * RPC客户端通道
-     *
-     * @author sea
-     */
-    public static class RPCClientChannel extends NioSocketChannel {
-
-        private RPCResponse responseMessage;
-
-        private ReentrantLock lock = new ReentrantLock();
-
-        private Condition hasMessage = lock.newCondition();
-
-        public void reset() {
-            this.responseMessage = null;
-        }
-
-        public RPCResponse get(long timeout) throws InterruptedException {
-            lock.lock();
-            try {
-                long start = System.currentTimeMillis();
-                //在超时时间内取十次返回结果
-                long waitInterval = timeout / 10;
-                boolean timeoutFlag = false;
-                while (responseMessage == null) {
-                    boolean ok = hasMessage.await(waitInterval, TimeUnit.MILLISECONDS);
-                    timeoutFlag = System.currentTimeMillis() - start > timeout;
-                    if (ok || timeoutFlag) {
-                        break;
-                    }
-                }
-                if(timeoutFlag){
-                    throw new RPCServerRuntimeException("RPC服务调用超时，请重试！");
-                }
-            } finally {
-                lock.unlock();
-            }
-            return responseMessage;
-        }
-
-        public void set(RPCResponse message) {
-            lock.lock();
-            try {
-                responseMessage = message;
-                hasMessage.signal();
-            } finally {
-                lock.unlock();
-            }
-        }
-
     }
 }
