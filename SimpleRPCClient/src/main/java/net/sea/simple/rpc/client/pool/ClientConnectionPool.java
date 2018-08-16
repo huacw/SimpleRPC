@@ -1,19 +1,19 @@
 package net.sea.simple.rpc.client.pool;
 
 import io.netty.bootstrap.Bootstrap;
-import io.netty.channel.*;
+import io.netty.channel.Channel;
+import io.netty.channel.ChannelHandlerContext;
+import io.netty.channel.ChannelOption;
+import io.netty.channel.SimpleChannelInboundHandler;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.pool.AbstractChannelPoolHandler;
-import io.netty.channel.pool.ChannelPoolHandler;
 import io.netty.channel.pool.FixedChannelPool;
-import io.netty.channel.socket.SocketChannel;
-import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.channel.socket.SocketChannelConfig;
 import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.concurrent.Future;
 import net.sea.simple.rpc.client.config.ClientConfig;
-import net.sea.simple.rpc.client.proxy.ServiceProxy;
 import net.sea.simple.rpc.data.codec.RPCMessageDecoder;
 import net.sea.simple.rpc.data.codec.RPCMessageEncoder;
 import net.sea.simple.rpc.data.response.RPCResponse;
@@ -32,6 +32,10 @@ import java.util.concurrent.TimeUnit;
 public class ClientConnectionPool {
     private Logger logger = Logger.getLogger(getClass());
     private FixedChannelPool connPool = null;
+    /**
+     * 连接是否有效标记
+     */
+    private boolean validFlag = true;
     /**
      * 客户端连接
      */
@@ -64,6 +68,27 @@ public class ClientConnectionPool {
 //                    }
 //                });
         connPool = new FixedChannelPool(bootstrap, new PoolHandler(clientConfig), clientConfig.getMaxConnections());
+
+//        //监控连接是否异常
+//        new Thread(() -> {
+//            Timer timer = new Timer("timer");
+//            final long start = System.currentTimeMillis();
+//            timer.schedule(new TimerTask() {
+//                @Override
+//                public void run() {
+//                    Channel channel = bootstrap.connect().channel();
+//                    System.out.println(LocalDateTime.now() + "," + Thread.currentThread().getName() + " run");
+//                    validFlag = channel.isActive();
+//                    System.out.println("validFlag:" + validFlag);
+//                    if (validFlag) {
+//                        channel.close();
+//                        group.shutdownGracefully();
+//                        timer.cancel();
+//                        return;
+//                    }
+//                }
+//            }, 1000, 1000);
+//        }).start();
     }
 
     /**
@@ -81,10 +106,10 @@ public class ClientConnectionPool {
         public void channelCreated(Channel ch) throws Exception {
             logger.info("channel created");
             ClientConnection.RPCClientChannel channel = (ClientConnection.RPCClientChannel) ch;
-            channel.config().setKeepAlive(true);
-            channel.config().setTcpNoDelay(true);
-            ChannelPipeline pipeline = channel.pipeline();
-            ch.pipeline()
+            SocketChannelConfig config = channel.config();
+            config.setKeepAlive(true);
+            config.setTcpNoDelay(true);
+            channel.pipeline()
                     .addLast("decoder", new RPCMessageDecoder(1024 * 1024, 4, 4))
                     .addLast("encoder", new RPCMessageEncoder())
                     .addLast("readTimeoutHandler", new ReadTimeoutHandler(clientConfig.getConnectionTimeout()))

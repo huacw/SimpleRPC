@@ -50,8 +50,8 @@ public class ClientConnectionPoolManager {
         if (pool == null) {
             synchronized (lock) {
                 if (pool == null) {
-                    pool = new ClientConnectionPool(conn);
                     conn.setClientConfig(config);
+                    pool = new ClientConnectionPool(conn);
                     connectionMap.put(conn, pool);
                 }
             }
