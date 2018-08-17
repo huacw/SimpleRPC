@@ -51,7 +51,7 @@ public interface CommonConstants {
     /**
      * 默认RPC客户端的连接超时时间（5s）
      */
-    public int DEFAULT_CLIENT_CONNECTION_TIMEOUT = 5000;
+    public int DEFAULT_CLIENT_CONNECTION_TIMEOUT = 5;
     /**
      * 默认RPC客户端的连接超时时间（5s）
      */
