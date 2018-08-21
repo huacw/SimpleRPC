@@ -56,6 +56,6 @@ public final class RPCMessageEncoder extends MessageToByteEncoder<RPCMessage> {
         } else {
             sendBuf.writeInt(0);
         }
-        sendBuf.setInt(4, sendBuf.readableBytes() - 8);//设置报文长度
+        sendBuf.setInt(4, sendBuf.readableBytes() - 8);//设置报文长度（去掉CrcCode和length字段的长度）
     }
 }
