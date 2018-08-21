@@ -79,7 +79,7 @@ public class ServiceServer extends AbstractServer {
                     .childHandler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         public void initChannel(SocketChannel ch) throws IOException {
-                            ch.pipeline().addLast("decoder", new RPCMessageDecoder(1024 * 1024, 4, 4))
+                            ch.pipeline().addLast("decoder", new RPCMessageDecoder(CommonConstants.MAX_MESSAGE_LENGTH, 4, 4))
                                     .addLast("encoder", new RPCMessageEncoder())
                                     .addLast("readTimeoutHandler", new ReadTimeoutHandler(60))
                                     .addLast("serviceHandler", new ServiceHandler());

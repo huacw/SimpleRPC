@@ -14,6 +14,7 @@ import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.concurrent.Future;
 import net.sea.simple.rpc.client.config.ClientConfig;
+import net.sea.simple.rpc.constants.CommonConstants;
 import net.sea.simple.rpc.data.codec.RPCMessageDecoder;
 import net.sea.simple.rpc.data.codec.RPCMessageEncoder;
 import net.sea.simple.rpc.data.response.RPCResponse;
@@ -110,7 +111,7 @@ public class ClientConnectionPool {
             config.setKeepAlive(true);
             config.setTcpNoDelay(true);
             channel.pipeline()
-                    .addLast("decoder", new RPCMessageDecoder(1024 * 1024, 4, 4))
+                    .addLast("decoder", new RPCMessageDecoder(CommonConstants.MAX_MESSAGE_LENGTH, 4, 4))
                     .addLast("encoder", new RPCMessageEncoder())
                     .addLast("readTimeoutHandler", new ReadTimeoutHandler(clientConfig.getConnectionTimeout()))
                     .addLast("clientHandler", new ClientHandler());

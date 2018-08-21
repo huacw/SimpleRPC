@@ -80,6 +80,10 @@ public interface CommonConstants {
      * 请求优先级（最小）
      */
     public byte REQUEST_MIN_PRIORITY = 1;
+    /**
+     * 最大报文长度(10M)
+     */
+    public int MAX_MESSAGE_LENGTH = 10 * 1024 * 1024;
 
     /**
      * 错误码
