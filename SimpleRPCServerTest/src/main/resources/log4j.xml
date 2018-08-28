@@ -4,15 +4,7 @@
     <!-- 输出到控制台中 -->
     <appender name="Console" class="org.apache.log4j.ConsoleAppender">
         <layout class="net.sea.simple.rpc.logger.CtxPatternLayout">
-            <param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss} [%S] %-5p (%c:%L) - %m%n"/>
-        </layout>
-    </appender>
-
-    <!-- 输出到文件中(每天一个目录) -->
-    <appender name="Default" class="mtime.lark.util.log.DailyFileAppender">
-        <param name="File" value="default.log"/>
-        <layout class="org.apache.log4j.PatternLayout">
-            <param name="ConversionPattern" value="%d{yy-MM-dd HH:mm:ss} %-5p (%c:%L) - %m%n"/>
+            <param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} [%S] %-5p (%c:%L) - %m%n"/>
         </layout>
     </appender>
 
