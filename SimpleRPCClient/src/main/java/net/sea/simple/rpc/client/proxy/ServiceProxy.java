@@ -104,6 +104,8 @@ public class ServiceProxy implements MethodInterceptor {
             // 设置需要创建子类的类
             enhancer.setSuperclass(clazz);
             enhancer.setCallback(proxyCache.get(clazz));
+            // 不拦截构造函数
+            enhancer.setInterceptDuringConstruction(false);
             // 通过字节码技术动态创建子类实例
             result = (T) enhancer.create();
             // 放入缓存中
