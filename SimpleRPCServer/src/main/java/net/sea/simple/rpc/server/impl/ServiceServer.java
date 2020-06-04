@@ -136,7 +136,9 @@ public class ServiceServer extends AbstractServer {
                 Object result = service.invoke(body.getMethod(), body.getArgs().toArray());
                 response.getHeader().setStatusCode(CommonConstants.SUCCESS_CODE);
                 RPCResponseBody responseBody = new RPCResponseBody();
-                responseBody.setResult((Serializable) result);
+                if (result != null) {
+                    responseBody.setResult((Serializable) result);
+                }
                 response.setResponseBody(responseBody);
             } catch (Throwable throwable) {
                 logger.error("RPC服务异常", throwable);
