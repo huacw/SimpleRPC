@@ -45,7 +45,7 @@ public class ServiceMeta {
      */
     public Object invoke(String methodName, Object... args) throws InvocationTargetException, IllegalAccessException {
         if (methodMeta == null) {
-            throw new RPCServerRuntimeException(CommonConstants.ErrorCode.ERR_NO_METHOD, String.format("服务【%s】发布PRPC方法", serviceName));
+            throw new RPCServerRuntimeException(CommonConstants.ErrorCode.ERR_NO_METHOD, String.format("服务【%s】发布RPC方法", serviceName));
         }
         List<Class<?>> params = new ArrayList<>();
         for (Object arg : args) {

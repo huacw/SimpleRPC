@@ -1,6 +1,7 @@
 package net.sea.simple.rpc.register.center.zk.loadbalancer.strategy;
 
 import net.sea.simple.rpc.utils.RPCServiceCache;
+import org.apache.log4j.Logger;
 
 import java.util.List;
 
@@ -12,6 +13,7 @@ import java.util.List;
  * @Version 1.0
  */
 public class ZKRoundLoadBalancerStrategy extends AbstractZKLoadBalancerStrategy {
+    private Logger logger = Logger.getLogger(getClass());
     private static final String CURRENT_INDEX = "load_balancer_strategy_current_index";
 
     @Override
@@ -24,12 +26,12 @@ public class ZKRoundLoadBalancerStrategy extends AbstractZKLoadBalancerStrategy 
         }
         index = index % nodes.size();
         RPCServiceCache.newCache().putAttr(CURRENT_INDEX, index);
-        System.out.println("index:" + index);
+        logger.info(String.format("当前服务节点序号:%s", index));
         return nodes.get(index);
     }
 
     @Override
     protected boolean isLastNode(List<String> nodes) {
-        return (Integer)RPCServiceCache.newCache().getAttr(CURRENT_INDEX) == nodes.size() - 1;
+        return (Integer) RPCServiceCache.newCache().getAttr(CURRENT_INDEX) == nodes.size() - 1;
     }
 }
