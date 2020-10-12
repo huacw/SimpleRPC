@@ -23,7 +23,7 @@
     <name>SimpleRPC</name>
 
     <properties>
-        <junit.version>4.12</junit.version>
+        <junit.version>4.13.1</junit.version>
         <spring.boot.version>1.5.14.RELEASE</spring.boot.version>
         <nttety.version>4.1.16.Final</nttety.version>
         <spring.verion>4.3.13.RELEASE</spring.verion>
