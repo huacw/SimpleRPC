@@ -2,7 +2,6 @@ package net.sea.simple.rpc.server;
 
 import net.sea.simple.rpc.exception.RPCServerException;
 import net.sea.simple.rpc.server.config.ServerConfig;
-import net.sea.simple.rpc.server.enumeration.ServiceType;
 import net.sea.simple.rpc.server.exception.UnsupportedServerTypeException;
 import net.sea.simple.rpc.server.impl.MsgServer;
 import net.sea.simple.rpc.server.impl.ServiceServer;

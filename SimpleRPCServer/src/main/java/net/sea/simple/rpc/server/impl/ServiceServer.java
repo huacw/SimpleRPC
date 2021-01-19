@@ -3,6 +3,7 @@ package net.sea.simple.rpc.server.impl;
 import java.io.IOException;
 import java.io.Serializable;
 
+import net.sea.simple.rpc.server.ServiceType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.beans.BeanUtils;
@@ -32,7 +33,6 @@ import net.sea.simple.rpc.data.response.RPCResponseBody;
 import net.sea.simple.rpc.exception.RPCServerException;
 import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 import net.sea.simple.rpc.server.config.ServerConfig;
-import net.sea.simple.rpc.server.enumeration.ServiceType;
 import net.sea.simple.rpc.server.meta.ServiceMeta;
 import net.sea.simple.rpc.server.utils.RPCCache;
 import net.sea.simple.rpc.utils.HostUtils;

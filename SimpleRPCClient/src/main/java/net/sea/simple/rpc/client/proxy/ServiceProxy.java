@@ -16,6 +16,7 @@ import net.sea.simple.rpc.data.response.RPCResponseBody;
 import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 import net.sea.simple.rpc.register.center.ServiceRegister;
 import net.sea.simple.rpc.server.ServiceInfo;
+import net.sea.simple.rpc.server.ServiceType;
 import net.sea.simple.rpc.utils.ContextUtils;
 import net.sea.simple.rpc.utils.HostUtils;
 import net.sea.simple.rpc.utils.JsonUtils;
@@ -30,6 +31,7 @@ import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -134,7 +136,6 @@ public class ServiceProxy implements MethodInterceptor {
 
         public RPCNettyClient() throws InterruptedException {
             initClient();
-
         }
 
         private void initClient() throws InterruptedException {
@@ -162,6 +163,10 @@ public class ServiceProxy implements MethodInterceptor {
             ClientConnection.RPCClientChannel clientChannel = (ClientConnection.RPCClientChannel) channel;
             clientChannel.reset();
             clientChannel.writeAndFlush(request);
+            if (!ServiceType.service.name().equals(serviceInfo.getServiceType())) {
+                logger.info("异步服务，提交后直接返回");
+                return Optional.empty();
+            }
             RPCResponse response = clientChannel.get(CommonConstants.DEFAULT_CONNECTION_TIMEOUT);
             RPCHeader responseHeader = response.getHeader();
             if (responseHeader.getStatusCode() != CommonConstants.SUCCESS_CODE) {

@@ -1,10 +1,12 @@
 register:
   center:
     config:
-      zk:
-        zkServers: 192.168.2.56:2181,192.168.2.56:2182,192.168.2.56:2183
-        sessionTimeout: 60000
-        connectionTimeout: 60000
+#      zk:
+#        zkServers: 192.168.2.56:2181,192.168.2.56:2182,192.168.2.56:2183
+#        sessionTimeout: 60000
+#        connectionTimeout: 60000
+      nacos:
+        serverAddresses: 127.0.0.1:8848
 #rpc:
 #  server:
 #    config:
@@ -16,4 +18,5 @@ spring:
   profiles:
 #    active: zk-reg-center
     #引用zk注册中心配置
-    include: zk-reg-center
+#    include: zk-reg-center
+    include: nacos-reg-center

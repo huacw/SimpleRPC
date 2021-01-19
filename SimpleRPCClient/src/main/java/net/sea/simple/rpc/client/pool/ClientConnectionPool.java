@@ -13,6 +13,7 @@ import io.netty.handler.logging.LogLevel;
 import io.netty.handler.logging.LoggingHandler;
 import io.netty.handler.timeout.ReadTimeoutHandler;
 import io.netty.util.concurrent.Future;
+import lombok.Setter;
 import net.sea.simple.rpc.client.config.ClientConfig;
 import net.sea.simple.rpc.constants.CommonConstants;
 import net.sea.simple.rpc.data.codec.RPCMessageDecoder;
@@ -21,6 +22,8 @@ import net.sea.simple.rpc.data.response.RPCResponse;
 import net.sea.simple.rpc.utils.SpringUtils;
 import org.apache.log4j.Logger;
 
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -37,6 +40,11 @@ public class ClientConnectionPool {
      * 连接是否有效标记
      */
     private boolean validFlag = true;
+    /**
+     * 最后使用时间戳
+     */
+    @Setter
+    private long lastUseTime;
     /**
      * 客户端连接
      */
@@ -69,7 +77,8 @@ public class ClientConnectionPool {
 //                    }
 //                });
         connPool = new FixedChannelPool(bootstrap, new PoolHandler(clientConfig), clientConfig.getMaxConnections());
-
+        //长时间未使用连接进行释放
+        watchConnection(group);
 //        //监控连接是否异常
 //        new Thread(() -> {
 //            Timer timer = new Timer("timer");
@@ -90,6 +99,29 @@ public class ClientConnectionPool {
 //                }
 //            }, 1000, 1000);
 //        }).start();
+    }
+
+    /**
+     * 监测客户端连接使用情况
+     * @param group
+     */
+    private void watchConnection(NioEventLoopGroup group) {
+        logger.info("启动监测客户端连接使用线程");
+        new Thread(() -> {
+            Timer timer = new Timer("监测客户端连接使用情况");
+            timer.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    logger.info("检测客户端连接");
+                    if (System.currentTimeMillis() - lastUseTime > CommonConstants.MAX_CLIENT_IDLE_TIME) {
+                        logger.info("客户端长时间未连接，连接释放");
+                        connPool.close();
+                        group.shutdownGracefully();
+                        timer.cancel();
+                    }
+                }
+            }, 1000, 1000);
+        }).start();
     }
 
     /**

@@ -3,7 +3,6 @@ package net.sea.simple.rpc.server;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import net.sea.simple.rpc.exception.RPCServerException;
-import net.sea.simple.rpc.server.enumeration.ServiceType;
 import net.sea.simple.rpc.server.utils.RPCCache;
 
 /**

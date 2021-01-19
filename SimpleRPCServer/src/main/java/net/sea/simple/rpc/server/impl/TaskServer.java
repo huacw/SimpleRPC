@@ -1,8 +1,8 @@
 package net.sea.simple.rpc.server.impl;
 
 import net.sea.simple.rpc.exception.RPCServerException;
+import net.sea.simple.rpc.server.ServiceType;
 import net.sea.simple.rpc.server.config.ServerConfig;
-import net.sea.simple.rpc.server.enumeration.ServiceType;
 
 /**
  * 任务类服务器

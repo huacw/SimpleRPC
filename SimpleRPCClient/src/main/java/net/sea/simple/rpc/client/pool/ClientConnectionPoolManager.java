@@ -56,6 +56,7 @@ public class ClientConnectionPoolManager {
                 }
             }
         }
+        pool.setLastUseTime(System.currentTimeMillis());
         return pool;
     }
 }
