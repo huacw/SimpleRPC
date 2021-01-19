@@ -18,6 +18,7 @@
         <module>SimpleRPCRegisterCenter</module>
         <module>SimpleRPCZKRegisterCenter</module>
         <module>SimpleRPCEtcdRegisterCenter</module>
+        <module>SimpleRPCNacosRegisterCenter</module>
     </modules>
     <packaging>pom</packaging>
     <name>SimpleRPC</name>
@@ -29,6 +30,8 @@
         <spring.verion>4.3.13.RELEASE</spring.verion>
         <marshalling.verion>2.0.2.Final</marshalling.verion>
         <!--<spring.boot.version>2.0.3.RELEASE</spring.boot.version>-->
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -37,6 +40,12 @@
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.16</version>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 
