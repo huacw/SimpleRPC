@@ -19,4 +19,5 @@ spring:
 #    active: zk-reg-center
     #引用zk注册中心配置
 #    include: zk-reg-center
+    #引用nacos注册中心配置
     include: nacos-reg-center
