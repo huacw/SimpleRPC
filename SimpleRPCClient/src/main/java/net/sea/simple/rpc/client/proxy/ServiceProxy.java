@@ -1,6 +1,5 @@
 package net.sea.simple.rpc.client.proxy;
 
-import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;
 import net.sea.simple.rpc.client.annotation.RPCClient;
 import net.sea.simple.rpc.client.config.ClientConfig;
@@ -27,10 +26,12 @@ import net.sf.cglib.proxy.MethodProxy;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 
+import javax.xml.ws.Service;
 import java.io.Closeable;
 import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -46,10 +47,37 @@ public class ServiceProxy implements MethodInterceptor {
     private Class<?> clazz;
     //    private RPCClient client;
     private String appName;
+    private String version;
     private static ConcurrentMap<Class<?>, Object> cache = new ConcurrentHashMap<>();
-    private static ConcurrentMap<Class<?>, ServiceProxy> proxyCache = new ConcurrentHashMap<>();
+    private static ConcurrentMap<CacheKey, ServiceProxy> proxyCache = new ConcurrentHashMap<>();
 
     private ServiceProxy() {
+    }
+
+    /**
+     * 缓存的key
+     */
+    private static class CacheKey {
+        private Class<?> clazz;
+        private String version;
+
+        public CacheKey(Class<?> clazz, String version) {
+            this.clazz = clazz;
+            this.version = version;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            CacheKey cacheKey = (CacheKey) o;
+            return Objects.equals(clazz, cacheKey.clazz) && Objects.equals(version, cacheKey.version);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(clazz, version);
+        }
     }
 
     /**
@@ -61,12 +89,14 @@ public class ServiceProxy implements MethodInterceptor {
      */
     public static synchronized ServiceProxy newProxy(RPCClient client, Class<?> clazz) {
         ServiceProxy serviceProxy = null;
+        CacheKey cacheKey = new CacheKey(clazz, client.version());
         serviceProxy = proxyCache.get(clazz);
         if (serviceProxy == null) {
             serviceProxy = new ServiceProxy();
             serviceProxy.clazz = clazz;
             serviceProxy.appName = client.appName();
-            proxyCache.putIfAbsent(clazz, serviceProxy);
+            serviceProxy.version = client.version();
+            proxyCache.putIfAbsent(cacheKey, serviceProxy);
         }
         return serviceProxy;
     }
@@ -75,12 +105,14 @@ public class ServiceProxy implements MethodInterceptor {
      * 创建代理实例
      *
      * @param appName 服务名
+     * @param version
      * @param clazz   服务接口
      * @return
      */
-    public static synchronized ServiceProxy newProxy(String appName, Class<?> clazz) {
+    public static synchronized ServiceProxy newProxy(String appName, String version, Class<?> clazz) {
         ServiceProxy serviceProxy = null;
-        serviceProxy = proxyCache.get(clazz);
+        CacheKey cacheKey = new CacheKey(clazz, version);
+        serviceProxy = proxyCache.get(cacheKey);
         if (serviceProxy == null) {
             serviceProxy = new ServiceProxy();
             serviceProxy.clazz = clazz;
@@ -89,7 +121,12 @@ public class ServiceProxy implements MethodInterceptor {
             } else {
                 serviceProxy.appName = clazz.getPackage().getName();
             }
-            proxyCache.putIfAbsent(clazz, serviceProxy);
+            if (StringUtils.isNoneBlank(version)) {
+                serviceProxy.version = version;
+            } else {
+                serviceProxy.version = CommonConstants.DEFAULT_SERVICE_VERSION;
+            }
+            proxyCache.putIfAbsent(cacheKey, serviceProxy);
         }
         return serviceProxy;
     }
@@ -105,7 +142,7 @@ public class ServiceProxy implements MethodInterceptor {
         if (result == null) {
             // 设置需要创建子类的类
             enhancer.setSuperclass(clazz);
-            enhancer.setCallback(proxyCache.get(clazz));
+            enhancer.setCallback(proxyCache.get(new CacheKey(clazz, version)));
             // 不拦截构造函数
             enhancer.setInterceptDuringConstruction(false);
             // 通过字节码技术动态创建子类实例
@@ -142,7 +179,9 @@ public class ServiceProxy implements MethodInterceptor {
             ClientConfig clientConfig = SpringUtils.getBean(ClientConfig.class);
 
             ServiceRegister serviceRegister = ServiceRegister.newInstance();
-            serviceInfo = serviceRegister.findService(appName);
+            ServiceInfo queryService = new ServiceInfo(appName);
+            queryService.setVersion(version);
+            serviceInfo = serviceRegister.findService(queryService);
             logger.info(String.format("获取的服务信息：%s", serviceInfo.toString()));
             pool = ClientConnectionPoolManager.getClientConnectionPool(serviceInfo.getHost(), serviceInfo.getPort(), clientConfig);
         }

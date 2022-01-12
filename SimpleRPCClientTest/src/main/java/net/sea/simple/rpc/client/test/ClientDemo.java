@@ -12,17 +12,17 @@ import org.springframework.stereotype.Service;
  */
 @Service
 public class ClientDemo {
-//    @RPCClient(appName = "net.sea.demo.service")
+    //@RPCClient(appName = "net.sea.demo.service", version = "2.0")
     @Autowired
     private DemoService demoService;
-//    @RPCClient(appName = "net.sea.demo.service")
+    //    @RPCClient(appName = "net.sea.demo.service")
     @Autowired
     private DemoService demoService1;
 
     public void sayHello() {
         System.out.println(demoService.say("Jack"));
         String[] towns = demoService.queryTowns();
-        for (String town:towns){
+        for (String town : towns) {
             System.out.println(town);
         }
         System.out.println(demoService.test());

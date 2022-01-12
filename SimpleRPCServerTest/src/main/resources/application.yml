@@ -15,10 +15,10 @@ rpc:
     config:
       serviceName: net.sea.demo.service
       serviceIp: 192.168.2.86
-      port: 22001
+      port: 12001
       opened: true
       heartPeriod: 60000
-      version: 2.0
+      version: 1.0
 spring:
   profiles:
 #    active: zk-reg-center

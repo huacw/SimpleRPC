@@ -16,13 +16,14 @@ import org.springframework.core.annotation.Order;
  */
 @Configuration
 @Lazy
-@Order(Ordered.LOWEST_PRECEDENCE+10)
+@Order(Ordered.LOWEST_PRECEDENCE + 10)
 public class SpringAutoConfig {
     private String svr = "net.sea.demo.service";
+    private String version = "2.0";
 
     @Bean
     @ConditionalOnMissingBean
-    public DemoService voucherInfoAdminServiceProxy(){
-        return RPCClient.get(svr, DemoService.class);
+    public DemoService demoServiceProxy() {
+        return RPCClient.get(svr, version, DemoService.class);
     }
 }

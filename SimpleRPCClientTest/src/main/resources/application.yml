@@ -10,6 +10,13 @@ register:
         needAuth: true
         username: nacos
         password: nacos
+rpc:
+  service:
+    net:
+      sea:
+        demo:
+          service:
+            version : 2.0
 #rpc:
 #  server:
 #    config:
