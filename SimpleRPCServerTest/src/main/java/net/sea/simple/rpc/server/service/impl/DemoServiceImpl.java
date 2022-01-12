@@ -12,7 +12,7 @@ import java.util.Map;
  * @Date 2018/4/20 14:51
  * @Version 1.0
  */
-@RPCService(publishClasses = {DemoService.class})
+@RPCService(publishClasses = {DemoService.class}, version = "2.0")
 public class DemoServiceImpl implements DemoService {
     @Override
     public String say(String name) {
@@ -30,9 +30,9 @@ public class DemoServiceImpl implements DemoService {
     public Map<String, String> test() {
         System.out.println("test");
         Map<String, String> map = new HashMap<>();
-        map.put("key1","test1");
-        map.put("key2","test2");
-        map.put("1","test1");
+        map.put("key1", "test1");
+        map.put("key2", "test2");
+        map.put("1", "test1");
         return map;
     }
 

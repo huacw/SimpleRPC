@@ -7,6 +7,9 @@ register:
 #        connectionTimeout: 60000
       nacos:
         serverAddresses: 127.0.0.1:8848
+        needAuth: true
+        username: nacos
+        password: nacos
 #rpc:
 #  server:
 #    config:

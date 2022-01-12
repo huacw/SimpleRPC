@@ -7,13 +7,18 @@ register:
 #        connectionTimeout: 60000
       nacos:
         serverAddresses: 127.0.0.1:8848
+        needAuth: true
+        username: nacos
+        password: nacos
 rpc:
   server:
     config:
       serviceName: net.sea.demo.service
       serviceIp: 192.168.2.86
-      port: 12001
+      port: 22001
       opened: true
+      heartPeriod: 60000
+      version: 2.0
 spring:
   profiles:
 #    active: zk-reg-center

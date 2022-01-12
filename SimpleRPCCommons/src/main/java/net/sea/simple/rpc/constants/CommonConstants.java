@@ -35,7 +35,11 @@ public interface CommonConstants {
     /**
      * 默认的心跳超时时间（3000ms）
      */
-    int DEFAULT_HEART_TIMEOUT = 3000;
+    long DEFAULT_HEART_TIMEOUT = 3000;
+    /**
+     * 默认的session超时时间（3000ms）
+     */
+    int DEFAULT_SESSION_TIMEOUT = 60000;
     /**
      * 默认的注册中心类型
      */

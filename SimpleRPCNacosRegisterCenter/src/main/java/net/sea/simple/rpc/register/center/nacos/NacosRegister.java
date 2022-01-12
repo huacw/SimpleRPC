@@ -1,6 +1,7 @@
 package net.sea.simple.rpc.register.center.nacos;
 
 import com.alibaba.nacos.api.NacosFactory;
+import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
@@ -47,8 +48,12 @@ public class NacosRegister implements IRegister {
         nacosRegisterCenterConfig = SpringUtils.getBean(NacosRegisterCenterConfig.class);
         checkConfig(nacosRegisterCenterConfig);
         Properties properties = new Properties();
-        properties.setProperty("namespace", nacosRegisterCenterConfig.getNamespace());
-        properties.setProperty("serverAddr", nacosRegisterCenterConfig.getServerAddresses());
+        properties.setProperty(PropertyKeyConst.NAMESPACE, nacosRegisterCenterConfig.getNamespace());
+        properties.setProperty(PropertyKeyConst.SERVER_ADDR, nacosRegisterCenterConfig.getServerAddresses());
+        if (nacosRegisterCenterConfig.isNeedAuth()) {
+            properties.setProperty(PropertyKeyConst.USERNAME, nacosRegisterCenterConfig.getUsername());
+            properties.setProperty(PropertyKeyConst.PASSWORD, nacosRegisterCenterConfig.getPassword());
+        }
         try {
             namingService = NacosFactory.createNamingService(properties);
         } catch (NacosException e) {
@@ -76,6 +81,7 @@ public class NacosRegister implements IRegister {
 
     @Override
     public boolean addNode(ServiceInfo service) {
+
         Instance instance = new Instance();
         String serviceName = service.getServiceName();
         String host = service.getHost();
@@ -83,20 +89,34 @@ public class NacosRegister implements IRegister {
         instance.setInstanceId(String.format("%s-%s-%s", serviceName, host, port));
         instance.setEnabled(true);
         instance.setHealthy(true);
-        instance.setServiceName(serviceName);
+        String version = service.getVersion();
+        String regServiceName = getRegServiceName(service);
+        instance.setServiceName(regServiceName);
         instance.addMetadata("serverType", service.getServiceType());
-        instance.addMetadata("serverVersion", service.getVersion());
+        instance.addMetadata("serverVersion", version);
         instance.setIp(host);
         instance.setPort(port);
         instance.setWeight(1.0);
         try {
-            namingService.registerInstance(serviceName, instance);
-            logger.info(String.format("注册服务【%s】成功，注册的服务信息：%s", serviceName, JsonUtils.toJson(service)));
+            namingService.registerInstance(regServiceName, instance);
+            logger.info(String.format("注册服务【%s】版本【%s】成功，注册的服务信息：%s", serviceName, version, JsonUtils.toJson(service)));
             return true;
         } catch (NacosException e) {
             logger.error(String.format("注册服务【%s】异常", serviceName), e);
             return false;
         }
+    }
+
+    /**
+     * 获取注册的实际服务名称
+     *
+     * @param service
+     * @return
+     */
+    private String getRegServiceName(ServiceInfo service) {
+        String version = service.getVersion();
+        String serviceName = service.getServiceName();
+        return String.format("%s_%s", serviceName, version);
     }
 
     @Override
@@ -105,7 +125,7 @@ public class NacosRegister implements IRegister {
         String host = service.getHost();
         int port = service.getPort();
         try {
-            namingService.deregisterInstance(serviceName, host, port);
+            namingService.deregisterInstance(getRegServiceName(service), host, port);
             logger.info(String.format("注销服务【%s】成功，注销的服务信息：%s", serviceName, JsonUtils.toJson(service)));
             return true;
         } catch (NacosException e) {
@@ -123,7 +143,7 @@ public class NacosRegister implements IRegister {
     public ServiceInfo findNode(ServiceInfo service) {
         String serviceName = service.getServiceName();
         try {
-            Instance instance = namingService.selectOneHealthyInstance(serviceName);
+            Instance instance = namingService.selectOneHealthyInstance(getRegServiceName(service));
             ServiceInfo serviceInfo = new ServiceInfo(instance.getServiceName());
             serviceInfo.setHost(instance.getIp());
             serviceInfo.setPort(instance.getPort());
@@ -139,7 +159,7 @@ public class NacosRegister implements IRegister {
 
     @Override
     public boolean hasNode(ServiceInfo service) {
-        return hasNextServiceNode(service.getServiceName());
+        return hasNextServiceNode(getRegServiceName(service));
     }
 
     @Override

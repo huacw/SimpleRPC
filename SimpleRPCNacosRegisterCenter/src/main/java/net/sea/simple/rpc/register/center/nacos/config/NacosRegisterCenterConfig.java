@@ -36,4 +36,23 @@ public class NacosRegisterCenterConfig extends RegisterCenterConfig {
     @Setter
     @Getter
     private String namespace = "public";
+
+    /**
+     * 是否需要权限认证
+     */
+    @Setter
+    @Getter
+    private boolean needAuth = false;
+    /**
+     * nacos服务器用户名
+     */
+    @Setter
+    @Getter
+    private String username;
+    /**
+     * nacos服务器用户名密码
+     */
+    @Setter
+    @Getter
+    private String password;
 }

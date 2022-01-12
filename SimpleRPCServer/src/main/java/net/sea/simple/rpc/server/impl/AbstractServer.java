@@ -14,6 +14,9 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
 /**
  * 抽象服务器
  *
@@ -102,6 +105,7 @@ public abstract class AbstractServer implements IRPCServer {
         info.setHost(StringUtils.isEmpty(serviceIp) ? HostUtils.getLocalIP() : serviceIp);
         info.setPort(config.getPort());
         info.setServiceType(getServiceType());
+        info.setVersion(config.getVersion());
         return info;
     }
 
@@ -127,18 +131,14 @@ public abstract class AbstractServer implements IRPCServer {
      * @param config
      */
     protected void startHeartbeat(final ServerConfig config) {
-        new Thread(() -> {
-            while (true) {
-                //休眠1s
-                try {
-                    Thread.sleep(CommonConstants.DEFAULT_HEART_TIMEOUT);
-                } catch (InterruptedException e) {
-                    logger.warn("心跳程序休眠异常", e);
-                }
-                //1s后重新注册服务
+        Long heartPeriod = config.getHeartPeriod();
+        new Timer().schedule(new TimerTask() {
+            @Override
+            public void run() {
+                //服务重新注册
                 ServiceRegister serviceRegister = ServiceRegister.newInstance();
                 serviceRegister.registerAgain(createServiceInfo(config));
             }
-        }).start();
+        }, heartPeriod, heartPeriod == null || heartPeriod <= 0 ? CommonConstants.DEFAULT_HEART_TIMEOUT : heartPeriod);
     }
 }
