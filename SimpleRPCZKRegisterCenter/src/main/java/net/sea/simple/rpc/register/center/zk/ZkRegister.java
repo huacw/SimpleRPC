@@ -35,8 +35,8 @@ import java.util.*;
  * @Date 2018/7/13 15:49
  * @Version 1.0
  */
-@Component
-@Profile(ZKConstants.REGISTER_CENTER_PROFILE)
+//@Component
+//@Profile(ZKConstants.REGISTER_CENTER_PROFILE)
 public class ZkRegister implements IRegister {
     private Logger logger = Logger.getLogger(getClass());
     private ZKRegisterCenterConfig config;
@@ -46,7 +46,8 @@ public class ZkRegister implements IRegister {
      */
     private Map<String, LoadBalancerStrategy> loadBalancerStrategyMapper = new HashMap<>(16);
 
-    private ZkRegister() {
+    public ZkRegister(ZKRegisterCenterConfig config) {
+        this.config = config;
         init();
     }
 
@@ -54,7 +55,7 @@ public class ZkRegister implements IRegister {
      * 初始化方法
      */
     private void init() {
-        config = (ZKRegisterCenterConfig) SpringUtils.getBean(RegisterCenterConfig.class);
+        //config = (ZKRegisterCenterConfig) SpringUtils.getBean(RegisterCenterConfig.class);
         logger.info("注册中心类型为：zookeeper");
         checkConfig(config);
         client = new ZkClient(config.getZkServers(), config.getSessionTimeout(), config.getConnectionTimeout());
@@ -272,7 +273,7 @@ public class ZkRegister implements IRegister {
     private void checkConfig(ZKRegisterCenterConfig config) {
         if (config == null || StringUtils.isBlank(config.getZkServers())) {
             throw new RPCServerRuntimeException(String.format("【\n%s\n】配置缺失",
-                                                              "register.center.config.zk.zkServers或\nregister:\n\tcenter:\n\t\tconfig:\n\t\t\tzk:\n\t\t\t\tzkServers"));
+                    "register.center.config.zk.zkServers或\nregister:\n\tcenter:\n\t\tconfig:\n\t\t\tzk:\n\t\t\t\tzkServers"));
         }
     }
 

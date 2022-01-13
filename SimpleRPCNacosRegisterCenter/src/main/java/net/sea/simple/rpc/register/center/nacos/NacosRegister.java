@@ -12,12 +12,8 @@ import net.sea.simple.rpc.register.center.nacos.config.NacosRegisterCenterConfig
 import net.sea.simple.rpc.register.center.nacos.constants.NacosConstants;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.JsonUtils;
-import net.sea.simple.rpc.utils.SpringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Profile;
-import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
 import java.util.List;
@@ -29,14 +25,13 @@ import java.util.Properties;
  * @Author: hcw
  * @Date: 2021/1/19 10:42
  */
-@Component
-@Profile(NacosConstants.REGISTER_CENTER_PROFILE)
 public class NacosRegister implements IRegister {
     private Logger logger = Logger.getLogger(getClass());
     private NacosRegisterCenterConfig nacosRegisterCenterConfig;
     private NamingService namingService;
 
-    public NacosRegister() {
+    public NacosRegister(NacosRegisterCenterConfig nacosRegisterCenterConfig) {
+        this.nacosRegisterCenterConfig = nacosRegisterCenterConfig;
         init();
     }
 
@@ -45,7 +40,6 @@ public class NacosRegister implements IRegister {
      */
     private void init() {
         logger.info("注册中心类型为：nacos");
-        nacosRegisterCenterConfig = SpringUtils.getBean(NacosRegisterCenterConfig.class);
         checkConfig(nacosRegisterCenterConfig);
         Properties properties = new Properties();
         properties.setProperty(PropertyKeyConst.NAMESPACE, nacosRegisterCenterConfig.getNamespace());

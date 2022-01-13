@@ -22,7 +22,7 @@ public class ServiceRegister {
     /**
      * 单例对象锁
      */
-    private static Object lock = new Object();
+    private volatile static Object lock = new Object();
 
     private ServiceRegister() {
     }
@@ -106,7 +106,7 @@ public class ServiceRegister {
     }
 
     /**
-     * 根据服务名称和地址查询PRC服务
+     * 根据服务名称和地址查询RPC服务
      *
      * @param serviceName
      * @param host
@@ -158,7 +158,7 @@ public class ServiceRegister {
     }
 
     /**
-     * 根据服务名称查询RPC服务还有可用几点
+     * 根据服务名称查询RPC服务还有可用节点
      *
      * @param serviceName
      * @return

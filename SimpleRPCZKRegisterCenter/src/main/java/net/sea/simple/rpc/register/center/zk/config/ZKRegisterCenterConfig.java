@@ -4,7 +4,6 @@ import net.sea.simple.rpc.register.center.config.RegisterCenterConfig;
 import net.sea.simple.rpc.register.center.zk.constants.ZKConstants;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 
@@ -18,7 +17,7 @@ import org.springframework.stereotype.Component;
 @Component
 @EnableAutoConfiguration
 @ConfigurationProperties(prefix = "register.center.config.zk")
-@Profile(ZKConstants.REGISTER_CENTER_PROFILE)
+//@Profile(ZKConstants.REGISTER_CENTER_PROFILE)
 public class ZKRegisterCenterConfig extends RegisterCenterConfig {
     public ZKRegisterCenterConfig() {
         registerCenterType = ZKConstants.REGISTER_CENTER_TYPE;
