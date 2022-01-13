@@ -1,0 +1,34 @@
+register:
+  center:
+    config:
+      zk:
+        enable: false
+        zkServers: localhost:2181
+        sessionTimeout: 60000
+        connectionTimeout: 60000
+      nacos:
+        enable: true
+        serverAddresses: 127.0.0.1:8848
+        needAuth: true
+        username: nacos
+        password: nacos
+rpc:
+  service:
+    net:
+      sea:
+        demo:
+          service:
+#            version : 2.0
+#rpc:
+#  server:
+#    config:
+#      serviceName: net.sea.demo.service
+##      serviceIp: 192.168.4.119
+#      port: 2001
+#      opened: true
+spring:
+  profiles:
+#    active: zk-reg-center
+    #引用zk注册中心配置
+#    include: zk-reg-center
+#    include: nacos-reg-center

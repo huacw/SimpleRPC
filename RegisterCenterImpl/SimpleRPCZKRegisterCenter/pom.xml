@@ -6,19 +6,21 @@
     <modelVersion>4.0.0</modelVersion>
     <parent>
         <groupId>net.sea.simple.rpc</groupId>
-        <artifactId>net.sea.simple.rpc.parent</artifactId>
+        <artifactId>net.sea.simple.rpc.register.center.impl</artifactId>
         <version>1.0.0-SNAPSHOT</version>
     </parent>
-    <artifactId>net.sea.simple.rpc.register.center</artifactId>
-    <name>SimpleRPCRegisterCenter</name>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    </properties>
+    <artifactId>net.sea.simple.rpc.register.center.zk</artifactId>
+    <name>SimpleRPCZKRegisterCenter</name>
     <dependencies>
         <dependency>
             <groupId>net.sea.simple.rpc</groupId>
-            <artifactId>net.sea.simple.rpc.commons</artifactId>
+            <artifactId>net.sea.simple.rpc.register.center</artifactId>
             <version>1.0.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.adyliu</groupId>
+            <artifactId>zkclient</artifactId>
+            <version>2.1.1</version>
         </dependency>
     </dependencies>
 </project>
