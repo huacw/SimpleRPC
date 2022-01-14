@@ -9,7 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * @Description:
+ * @Description: nacos注册中心配置
  * @Author: hcw
  * @Date: 2021/1/19 10:28
  */

@@ -1,8 +1,8 @@
 package net.sea.simple.rpc.register.center;
 
-import net.sea.simple.rpc.exception.RPCServerRuntimeException;
-import net.sea.simple.rpc.register.center.config.RegisterCenterConfig;
 import net.sea.simple.rpc.server.ServiceInfo;
+
+import java.util.List;
 
 /**
  * 注册器接口
@@ -17,7 +17,14 @@ public interface IRegister {
      *
      * @return
      */
-    public String getRegisterName();
+    String getRegisterName();
+
+    /**
+     * 获取注册中心签名
+     *
+     * @return
+     */
+    String getRGSign();
 
     /**
      * 添加服务节点
@@ -25,7 +32,7 @@ public interface IRegister {
      * @param service
      * @return
      */
-    public boolean addNode(ServiceInfo service);
+    boolean addNode(ServiceInfo service);
 
     /**
      * 删除服务节点
@@ -33,7 +40,7 @@ public interface IRegister {
      * @param service
      * @return
      */
-    public boolean removeNode(ServiceInfo service);
+    boolean removeNode(ServiceInfo service);
 
     /**
      * 服务重连
@@ -41,7 +48,7 @@ public interface IRegister {
      * @param service
      * @return
      */
-    public boolean reconnect(ServiceInfo service);
+    boolean reconnect(ServiceInfo service);
 
     /**
      * 查找服务节点
@@ -49,7 +56,7 @@ public interface IRegister {
      * @param service
      * @return
      */
-    public ServiceInfo findNode(ServiceInfo service);
+    ServiceInfo findNode(ServiceInfo service);
 
     /**
      * 服务节点是否存在
@@ -57,7 +64,7 @@ public interface IRegister {
      * @param service
      * @return
      */
-    public boolean hasNode(ServiceInfo service);
+    boolean hasNode(ServiceInfo service);
 
     /**
      * 是否还有可用服务节点
@@ -65,6 +72,13 @@ public interface IRegister {
      * @param serviceName
      * @return
      */
-    public boolean hasNextServiceNode(String serviceName);
+    boolean hasNextServiceNode(String serviceName);
+
+    /**
+     * 查询所有可用服务
+     *
+     * @return
+     */
+    List<ServiceInfo> findAllAvailableServices();
 }
 

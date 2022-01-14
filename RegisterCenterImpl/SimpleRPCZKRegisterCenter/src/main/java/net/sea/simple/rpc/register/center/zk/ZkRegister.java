@@ -16,6 +16,7 @@ import net.sea.simple.rpc.register.center.zk.loadbalancer.strategy.ZKRoundLoadBa
 import net.sea.simple.rpc.register.center.zk.utils.ZKUtils;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.JsonUtils;
+import net.sea.simple.rpc.utils.MD5Util;
 import net.sea.simple.rpc.utils.RPCServiceCache;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
@@ -278,6 +279,11 @@ public class ZkRegister implements IRegister {
     }
 
     @Override
+    public String getRGSign() {
+        return MD5Util.encrypt(config.getZkServers());
+    }
+
+    @Override
     public boolean hasNextServiceNode(String serviceName) {
         try {
             LoadBalancerStrategy loadBalancerStrategy = getLoadBalancerStrategy();
@@ -287,5 +293,10 @@ public class ZkRegister implements IRegister {
         } catch (ClassNotFoundException | ClassCastException | IllegalAccessException | InstantiationException e) {
             throw new RPCServerRuntimeException(e);
         }
+    }
+
+    @Override
+    public List<ServiceInfo> findAllAvailableServices() {
+        return null;
     }
 }

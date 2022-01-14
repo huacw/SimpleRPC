@@ -12,6 +12,9 @@ register:
         needAuth: true
         username: nacos
         password: nacos
+    cache:
+      enable: true
+
 rpc:
   service:
     net:

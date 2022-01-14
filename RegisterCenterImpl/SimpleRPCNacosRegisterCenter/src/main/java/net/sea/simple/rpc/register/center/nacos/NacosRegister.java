@@ -8,10 +8,13 @@ import com.alibaba.nacos.api.naming.pojo.Instance;
 import net.sea.simple.rpc.constants.CommonConstants;
 import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 import net.sea.simple.rpc.register.center.IRegister;
+import net.sea.simple.rpc.register.center.cache.IServiceRouterCache;
+import net.sea.simple.rpc.register.center.cache.impl.FileServiceRouterCache;
 import net.sea.simple.rpc.register.center.nacos.config.NacosRegisterCenterConfig;
 import net.sea.simple.rpc.register.center.nacos.constants.NacosConstants;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.JsonUtils;
+import net.sea.simple.rpc.utils.MD5Util;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.util.CollectionUtils;
@@ -19,6 +22,7 @@ import org.springframework.util.CollectionUtils;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.stream.Collectors;
 
 /**
  * @Description: nacos的注册器
@@ -29,6 +33,7 @@ public class NacosRegister implements IRegister {
     private Logger logger = Logger.getLogger(getClass());
     private NacosRegisterCenterConfig nacosRegisterCenterConfig;
     private NamingService namingService;
+    private IServiceRouterCache serviceRouterCache;
 
     public NacosRegister(NacosRegisterCenterConfig nacosRegisterCenterConfig) {
         this.nacosRegisterCenterConfig = nacosRegisterCenterConfig;
@@ -71,6 +76,11 @@ public class NacosRegister implements IRegister {
     @Override
     public String getRegisterName() {
         return NacosConstants.REGISTER_CENTER_TYPE;
+    }
+
+    @Override
+    public String getRGSign() {
+        return MD5Util.encrypt(nacosRegisterCenterConfig.getServerAddresses());
     }
 
     @Override
@@ -160,10 +170,16 @@ public class NacosRegister implements IRegister {
     public boolean hasNextServiceNode(String serviceName) {
         try {
             List<Instance> allInstances = namingService.getAllInstances(serviceName, true);
+            allInstances = allInstances.stream().filter(Instance::isHealthy).collect(Collectors.toList());
             return !CollectionUtils.isEmpty(allInstances);
         } catch (NacosException e) {
             logger.error(String.format("获取所有可用服务【%s】异常", serviceName), e);
             return false;
         }
+    }
+
+    @Override
+    public List<ServiceInfo> findAllAvailableServices() {
+        return null;
     }
 }
