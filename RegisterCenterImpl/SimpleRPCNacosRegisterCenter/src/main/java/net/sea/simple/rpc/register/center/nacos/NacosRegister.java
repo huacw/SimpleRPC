@@ -5,11 +5,11 @@ import com.alibaba.nacos.api.PropertyKeyConst;
 import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
+import com.alibaba.nacos.api.naming.pojo.ListView;
 import net.sea.simple.rpc.constants.CommonConstants;
 import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 import net.sea.simple.rpc.register.center.IRegister;
 import net.sea.simple.rpc.register.center.cache.IServiceRouterCache;
-import net.sea.simple.rpc.register.center.cache.impl.FileServiceRouterCache;
 import net.sea.simple.rpc.register.center.nacos.config.NacosRegisterCenterConfig;
 import net.sea.simple.rpc.register.center.nacos.constants.NacosConstants;
 import net.sea.simple.rpc.server.ServiceInfo;
@@ -19,9 +19,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -148,12 +146,7 @@ public class NacosRegister implements IRegister {
         String serviceName = service.getServiceName();
         try {
             Instance instance = namingService.selectOneHealthyInstance(getRegServiceName(service));
-            ServiceInfo serviceInfo = new ServiceInfo(instance.getServiceName());
-            serviceInfo.setHost(instance.getIp());
-            serviceInfo.setPort(instance.getPort());
-            Map<String, String> metadata = instance.getMetadata();
-            serviceInfo.setServiceType(metadata.get("serverType"));
-            serviceInfo.setVersion(metadata.getOrDefault("serverVersion", CommonConstants.DEFAULT_SERVICE_VERSION));
+            ServiceInfo serviceInfo = buildServiceInfo(instance);
             return serviceInfo;
         } catch (NacosException e) {
             logger.error(String.format("获取服务【%s】异常", serviceName), e);
@@ -169,7 +162,7 @@ public class NacosRegister implements IRegister {
     @Override
     public boolean hasNextServiceNode(String serviceName) {
         try {
-            List<Instance> allInstances = namingService.getAllInstances(serviceName, true);
+            List<Instance> allInstances = namingService.getAllInstances(serviceName, false);
             allInstances = allInstances.stream().filter(Instance::isHealthy).collect(Collectors.toList());
             return !CollectionUtils.isEmpty(allInstances);
         } catch (NacosException e) {
@@ -180,6 +173,41 @@ public class NacosRegister implements IRegister {
 
     @Override
     public List<ServiceInfo> findAllAvailableServices() {
-        return null;
+        List<ServiceInfo> serviceInfoList = new ArrayList<>();
+        try {
+            int pageIndex = 1;
+            int pageCount;
+            int pageSize = 100;
+            do {
+                ListView<String> listView = namingService.getServicesOfServer(pageIndex, pageSize);
+                pageCount = (listView.getCount() - 1) / pageSize + 1;
+                pageIndex++;
+                List<String> serviceNames = listView.getData();
+                for (String serviceName : serviceNames) {
+                    namingService.getAllInstances(serviceName, false).forEach(instance -> serviceInfoList.add(buildServiceInfo(instance)));
+                }
+            } while (pageIndex <= pageCount);
+        } catch (NacosException e) {
+            logger.error("获取所有注册服务异常", e);
+        }
+        return serviceInfoList;
+    }
+
+    /**
+     * 构建注册服务信息
+     *
+     * @param instance
+     * @return
+     */
+    private ServiceInfo buildServiceInfo(Instance instance) {
+        String serviceName = instance.getServiceName();
+        String[] tmpArray = serviceName.split("_");
+        ServiceInfo serviceInfo = new ServiceInfo(tmpArray[0]);
+        serviceInfo.setHost(instance.getIp());
+        serviceInfo.setPort(instance.getPort());
+        Map<String, String> metadata = instance.getMetadata();
+        serviceInfo.setServiceType(metadata.get("serverType"));
+        serviceInfo.setVersion(tmpArray.length < 2 || StringUtils.isBlank(tmpArray[1]) ? CommonConstants.DEFAULT_SERVICE_VERSION : tmpArray[1]);
+        return serviceInfo;
     }
 }
