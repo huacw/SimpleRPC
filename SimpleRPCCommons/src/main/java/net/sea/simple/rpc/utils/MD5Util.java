@@ -51,6 +51,6 @@ public class MD5Util {
         for (int i = 0; i < zeroCount; i++) {
             zeroPrefix.append("0");
         }
-        return String.format("%s%s", md5Str, zeroPrefix);
+        return String.format("%s%s", zeroPrefix, md5Str);
     }
 }
