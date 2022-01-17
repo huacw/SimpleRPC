@@ -1,5 +1,6 @@
 package net.sea.simple.rpc.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.h2.mvstore.ConcurrentArrayList;
 import org.springframework.util.CollectionUtils;
 
@@ -8,6 +9,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 /**
  * RPC服务本地缓存
@@ -16,6 +21,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @Date 2018/8/7 14:13
  * @Version 1.0
  */
+@Slf4j
 public class RPCServiceCache {
     // RPC服务缓存
     private Map<String, List<String>> SERVICE_CACHE = new ConcurrentHashMap<>();
@@ -23,6 +29,8 @@ public class RPCServiceCache {
     private volatile static RPCServiceCache cache = null;
     // 上下文
     private Map<String, Object> localContainer = new HashMap<>();
+    //缓存并发的锁对象
+    private ReadWriteLock lock = new ReentrantReadWriteLock();
 
     /**
      * 实例化缓存对象
@@ -62,10 +70,17 @@ public class RPCServiceCache {
             nodes = new ArrayList<>();
             SERVICE_CACHE.put(serviceName, nodes);
         }
-        synchronized (this) {
-            if (!nodes.contains(node)) {
-                nodes.add(node);
+        Lock writeLock = this.lock.writeLock();
+        try {
+            if (writeLock.tryLock(2, TimeUnit.SECONDS)) {
+                if (!nodes.contains(node)) {
+                    nodes.add(node);
+                }
             }
+        } catch (Exception e) {
+            log.error("添加服务节点的缓存获取锁异常", e);
+        } finally {
+            writeLock.unlock();
         }
     }
 
