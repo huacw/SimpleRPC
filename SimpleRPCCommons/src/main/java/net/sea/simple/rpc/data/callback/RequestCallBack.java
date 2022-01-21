@@ -1,12 +1,9 @@
 package net.sea.simple.rpc.data.callback;
 
 import io.netty.buffer.ByteBuf;
-import net.sea.simple.rpc.data.RPCMessage;
-import net.sea.simple.rpc.data.codec.MarshallingDecoder;
+import net.sea.simple.rpc.data.RPCHeader;
 import net.sea.simple.rpc.data.request.RPCRequest;
 import net.sea.simple.rpc.data.request.RPCRequestBody;
-import net.sea.simple.rpc.exception.RPCServerException;
-import net.sea.simple.rpc.utils.ByteBufUtils;
 import net.sea.simple.rpc.utils.XStreamUtil;
 
 /**
@@ -14,19 +11,19 @@ import net.sea.simple.rpc.utils.XStreamUtil;
  *
  * @author sea
  */
-public class RequestCallBack extends Callback {
+public class RequestCallBack extends Callback<RPCRequest> {
 
     @Override
-    protected void parseBody(RPCMessage message, MarshallingDecoder marshallingDecoder, ByteBuf buf)
-            throws RPCServerException {
-        RPCRequest request = (RPCRequest) message;
-//		request.setRequestBody(marshallingDecoder.decode(buf));
-//      request.setRequestBody(XStreamUtil.xmlToBean(ByteBufUtils.readString(buf), RPCRequestBody.class));
-        request.setRequestBody(XStreamUtil.xmlToBean(marshallingDecoder.decode(buf), RPCRequestBody.class));
+    protected void setStatusCode(ByteBuf buf, RPCHeader header) {
     }
 
     @Override
-    protected RPCMessage newMessage() {
+    protected void doParseBody(RPCRequest request, String body) {
+        request.setRequestBody(XStreamUtil.xmlToBean(body, RPCRequestBody.class));
+    }
+
+    @Override
+    protected RPCRequest newMessage() {
         return new RPCRequest();
     }
 
