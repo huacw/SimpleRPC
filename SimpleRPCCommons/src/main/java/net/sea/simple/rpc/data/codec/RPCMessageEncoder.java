@@ -1,20 +1,19 @@
 package net.sea.simple.rpc.data.codec;
 
-import java.io.IOException;
-import java.util.Map;
-
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;
 import net.sea.simple.rpc.constants.CommonConstants;
-import net.sea.simple.rpc.data.RPCBody;
 import net.sea.simple.rpc.data.RPCHeader;
 import net.sea.simple.rpc.data.RPCMessage;
 import net.sea.simple.rpc.exception.RPCServerException;
 import net.sea.simple.rpc.utils.ByteBufUtils;
+import net.sea.simple.rpc.utils.CRCCodeUtil;
 import net.sea.simple.rpc.utils.ContextUtils;
-import net.sea.simple.rpc.utils.MapUtils;
 import net.sea.simple.rpc.utils.XStreamUtil;
+
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 
 /**
  * RPC服务编码器
@@ -48,14 +47,18 @@ public final class RPCMessageEncoder extends MessageToByteEncoder<RPCMessage> {
         ByteBufUtils.writeString(sendBuf, header.getRemoteHost());
         ContextUtils.writeSessionId(sendBuf, header.getSessionId());
         ByteBufUtils.writeMap(sendBuf, header.getExProperties());
+        byte[] bodyBytes = new byte[0];
         if (msg.getBody() != null) {
             //marshallingEncoder.encode(msg.getBody(), sendBuf);
             //使用xml格式数据传输
             //ByteBufUtils.writeString(sendBuf, XStreamUtil.beanToXml(msg.getBody()));
-            marshallingEncoder.encode(XStreamUtil.beanToXml(msg.getBody()), sendBuf);
+            String body = XStreamUtil.beanToXml(msg.getBody());
+            bodyBytes = body.getBytes(StandardCharsets.UTF_8);
+            marshallingEncoder.encode(body, sendBuf);
         } else {
             sendBuf.writeInt(0);
         }
         sendBuf.setInt(4, sendBuf.readableBytes() - 8);//设置报文长度（去掉CrcCode和length字段的长度）
+        sendBuf.setInt(0, CRCCodeUtil.getCRC(bodyBytes));//设置crc校验码
     }
 }
