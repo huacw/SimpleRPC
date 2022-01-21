@@ -7,7 +7,6 @@ import net.sea.simple.rpc.register.center.cache.IServiceRouterCache;
 import net.sea.simple.rpc.register.center.cache.config.CacheConfig;
 import net.sea.simple.rpc.server.ServiceInfo;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Timer;
@@ -24,7 +23,7 @@ public abstract class AbstractServiceRouterCache implements IServiceRouterCache 
     protected IRegister register;
     protected CacheConfig config;
     //服务带版本号映射
-    protected Map<String, List<ServiceInfo>> serviceWithVersionMapper = new ConcurrentHashMap<>(16);
+    protected Map<String, List<ServiceInfo>> serviceWithVersionMapper;
 
     public AbstractServiceRouterCache() {
         log.info("当前缓存类型：{}", getCacheType());

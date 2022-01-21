@@ -2,6 +2,7 @@ package net.sea.simple.rpc.register.center;
 
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.SpringUtils;
+import org.apache.log4j.Logger;
 
 /**
  * 服务注册器
@@ -11,6 +12,7 @@ import net.sea.simple.rpc.utils.SpringUtils;
  * @Version 1.0
  */
 public class ServiceRegister {
+    private static Logger logger = Logger.getLogger(ServiceRegister.class);
     /**
      * 注册器对象
      */
@@ -41,6 +43,7 @@ public class ServiceRegister {
                 }
             }
         }
+        logger.info(String.format("当前的注册器为：%s", REG_INST.getRegisterName()));
         return serviceRegister;
     }
 
@@ -132,6 +135,7 @@ public class ServiceRegister {
      * @param serviceName
      * @return
      */
+    @Deprecated
     public boolean hasService(String serviceName) {
         return hasService(new ServiceInfo(serviceName));
     }
@@ -143,6 +147,7 @@ public class ServiceRegister {
      * @param host
      * @return
      */
+    @Deprecated
     public boolean hasService(String serviceName, String host) {
         return hasService(new ServiceInfo(serviceName, host));
     }
@@ -153,6 +158,7 @@ public class ServiceRegister {
      * @param service
      * @return
      */
+    @Deprecated
     public boolean hasService(ServiceInfo service) {
         return REG_INST.hasNode(service);
     }
@@ -163,6 +169,7 @@ public class ServiceRegister {
      * @param serviceName
      * @return
      */
+    @Deprecated
     public boolean hasNextServiceNode(String serviceName) {
         return REG_INST.hasNextServiceNode(serviceName);
     }

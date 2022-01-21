@@ -15,6 +15,7 @@ public class ServiceInfo {
     private int currentConnections;// 当前连接数
     private String version = CommonConstants.DEFAULT_SERVICE_VERSION;// 服务版本号
     private String serviceType;//服务类型
+    private double weight = CommonConstants.DEFAULT_SERVICE_WEIGHT;//服务权重
 
     public ServiceInfo(String serviceName) {
         super();
@@ -88,6 +89,14 @@ public class ServiceInfo {
         this.serviceType = serviceType;
     }
 
+    public double getWeight() {
+        return weight;
+    }
+
+    public void setWeight(double weight) {
+        this.weight = weight;
+    }
+
     @Override
     public String toString() {
         StringBuilder info = new StringBuilder();
@@ -97,6 +106,7 @@ public class ServiceInfo {
                 .append(", maxConnections=").append(maxConnections)
                 .append(", currentConnections=").append(currentConnections)
                 .append(", version='").append(version).append("'")
+                .append(", weight=").append(weight)
                 .append(", serviceType='").append(serviceType).append("'}");
         return info.toString();
     }

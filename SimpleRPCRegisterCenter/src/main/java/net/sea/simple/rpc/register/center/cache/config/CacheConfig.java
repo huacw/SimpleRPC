@@ -3,6 +3,7 @@ package net.sea.simple.rpc.register.center.cache.config;
 import lombok.Getter;
 import lombok.Setter;
 import net.sea.simple.rpc.register.center.IRegister;
+import net.sea.simple.rpc.register.center.cache.constants.CacheConstants;
 import org.springframework.beans.factory.annotation.Autowired;
 
 /**

@@ -25,6 +25,10 @@ public interface CommonConstants {
      */
     int SESSION_ID_LENGTH = 32;
     /**
+     * 服务的默认权重
+     */
+    double DEFAULT_SERVICE_WEIGHT = 1.0;
+    /**
      * 默认的字符集(字符串类型)
      */
     String DEFAULT_CHARSET_STR = "UTF-8";

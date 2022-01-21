@@ -1,4 +1,4 @@
-package net.sea.simple.rpc.register.center.cache.config;
+package net.sea.simple.rpc.register.center.cache.constants;
 
 /**
  * @Description: 缓存的常量类

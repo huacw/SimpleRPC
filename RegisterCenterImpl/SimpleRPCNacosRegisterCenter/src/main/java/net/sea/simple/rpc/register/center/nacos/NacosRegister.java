@@ -6,6 +6,8 @@ import com.alibaba.nacos.api.exception.NacosException;
 import com.alibaba.nacos.api.naming.NamingService;
 import com.alibaba.nacos.api.naming.pojo.Instance;
 import com.alibaba.nacos.api.naming.pojo.ListView;
+import com.alibaba.nacos.client.naming.utils.Chooser;
+import com.alibaba.nacos.client.naming.utils.Pair;
 import net.sea.simple.rpc.constants.CommonConstants;
 import net.sea.simple.rpc.exception.RPCServerRuntimeException;
 import net.sea.simple.rpc.register.center.IRegister;
@@ -15,11 +17,15 @@ import net.sea.simple.rpc.register.center.nacos.constants.NacosConstants;
 import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.JsonUtils;
 import net.sea.simple.rpc.utils.MD5Util;
+import net.sea.simple.rpc.utils.SpringUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.log4j.Logger;
 import org.springframework.util.CollectionUtils;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 
 /**
@@ -31,7 +37,13 @@ public class NacosRegister implements IRegister {
     private Logger logger = Logger.getLogger(getClass());
     private NacosRegisterCenterConfig nacosRegisterCenterConfig;
     private NamingService namingService;
-    private IServiceRouterCache serviceRouterCache;
+
+    /**
+     * 获取缓存实例
+     */
+    private static class CacheInstance {
+        private static IServiceRouterCache serviceRouterCache = SpringUtils.getBean(IServiceRouterCache.class);
+    }
 
     public NacosRegister(NacosRegisterCenterConfig nacosRegisterCenterConfig) {
         this.nacosRegisterCenterConfig = nacosRegisterCenterConfig;
@@ -66,8 +78,7 @@ public class NacosRegister implements IRegister {
      */
     private void checkConfig(NacosRegisterCenterConfig config) {
         if (config == null || StringUtils.isBlank(config.getServerAddresses())) {
-            throw new RPCServerRuntimeException(String.format("【\n%s\n】配置缺失",
-                    "register.center.config.nacos.serverAddresses或\nregister:\n\tcenter:\n\t\tconfig:\n\t\t\tnacos:\n\t\t\t\tserverAddresses或"));
+            throw new RPCServerRuntimeException(String.format("【\n%s\n】配置缺失", "register.center.config.nacos.serverAddresses或\nregister:\n\tcenter:\n\t\tconfig:\n\t\t\tnacos:\n\t\t\t\tserverAddresses或"));
         }
     }
 
@@ -98,7 +109,7 @@ public class NacosRegister implements IRegister {
         instance.addMetadata("serverVersion", version);
         instance.setIp(host);
         instance.setPort(port);
-        instance.setWeight(1.0);
+        instance.setWeight(service.getWeight());
         try {
             namingService.registerInstance(regServiceName, instance);
             logger.info(String.format("注册服务【%s】版本【%s】成功，注册的服务信息：%s", serviceName, version, JsonUtils.toJson(service)));
@@ -145,13 +156,56 @@ public class NacosRegister implements IRegister {
     public ServiceInfo findNode(ServiceInfo service) {
         String serviceName = service.getServiceName();
         try {
+            ServiceInfo serviceInfo = selectOneServiceInfoFromCache(service);
+            if (serviceInfo != null) {
+                return serviceInfo;
+            }
             Instance instance = namingService.selectOneHealthyInstance(getRegServiceName(service));
-            ServiceInfo serviceInfo = buildServiceInfo(instance);
+            serviceInfo = buildServiceInfo(instance);
             return serviceInfo;
         } catch (NacosException e) {
             logger.error(String.format("获取服务【%s】异常", serviceName), e);
             throw new RPCServerRuntimeException(e);
         }
+    }
+
+    /**
+     * nacos负载器
+     */
+    private static class RandomByWeight {
+
+        /**
+         * 根据权重随机从给定服务列表中返回一个服务信息
+         *
+         * @param hosts 给定服务列表
+         * @return 根据权重随机返回的服务实例
+         */
+        public static ServiceInfo selectHost(List<ServiceInfo> hosts) {
+            if (CollectionUtils.isEmpty(hosts)) {
+                return null;
+            }
+            List<Pair<ServiceInfo>> hostsWithWeight = new ArrayList<>();
+            for (ServiceInfo host : hosts) {
+                hostsWithWeight.add(new Pair<>(host, host.getWeight()));
+            }
+            Chooser<String, ServiceInfo> vipChooser = new Chooser("www.sea.net");
+            vipChooser.refresh(hostsWithWeight);
+            return vipChooser.randomWithWeight();
+        }
+    }
+
+    /**
+     * 从缓存中获取一个服务信息
+     *
+     * @param serviceInfo
+     * @return
+     */
+    private ServiceInfo selectOneServiceInfoFromCache(ServiceInfo serviceInfo) {
+        List<ServiceInfo> serviceInfoList = CacheInstance.serviceRouterCache.findServiceInfo(serviceInfo.getServiceName(), serviceInfo.getVersion());
+        if (CollectionUtils.isEmpty(serviceInfoList)) {
+            return null;
+        }
+        return RandomByWeight.selectHost(serviceInfoList);
     }
 
     @Override
@@ -184,7 +238,7 @@ public class NacosRegister implements IRegister {
                 pageIndex++;
                 List<String> serviceNames = listView.getData();
                 for (String serviceName : serviceNames) {
-                    namingService.getAllInstances(serviceName, false).forEach(instance -> serviceInfoList.add(buildServiceInfo(instance)));
+                    namingService.getAllInstances(serviceName, false).stream().filter(Instance::isHealthy).forEach(instance -> serviceInfoList.add(buildServiceInfo(instance)));
                 }
             } while (pageIndex <= pageCount);
         } catch (NacosException e) {
@@ -201,13 +255,16 @@ public class NacosRegister implements IRegister {
      */
     private ServiceInfo buildServiceInfo(Instance instance) {
         String serviceName = instance.getServiceName();
-        String[] tmpArray = serviceName.split("_");
+        String[] tmpArray = serviceName.split("@@")[1].split("_");
         ServiceInfo serviceInfo = new ServiceInfo(tmpArray[0]);
         serviceInfo.setHost(instance.getIp());
         serviceInfo.setPort(instance.getPort());
         Map<String, String> metadata = instance.getMetadata();
         serviceInfo.setServiceType(metadata.get("serverType"));
         serviceInfo.setVersion(tmpArray.length < 2 || StringUtils.isBlank(tmpArray[1]) ? CommonConstants.DEFAULT_SERVICE_VERSION : tmpArray[1]);
+        serviceInfo.setWeight(instance.getWeight());
         return serviceInfo;
     }
+
+
 }

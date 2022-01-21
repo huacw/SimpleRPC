@@ -194,7 +194,7 @@ public class ZkRegister implements IRegister {
      * @throws ClassNotFoundException
      */
     private LoadBalancerStrategy getLoadBalancerStrategy() throws InstantiationException, IllegalAccessException, ClassNotFoundException {
-        String loadBalancer = config.getLoadBalancer();
+        String loadBalancer = config.getLb();
         LoadBalancerStrategy loadBalancerStrategy = null;
         if (StringUtils.isBlank(loadBalancer)) {
             String defaultLoadBalancerKey = "default";

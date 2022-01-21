@@ -25,11 +25,23 @@ import java.util.List;
 public abstract class AbstractZKLoadBalancerStrategy implements LoadBalancerStrategy<ZKLoadBalancerContext> {
     @Override
     public ServiceInfo choose(ZKLoadBalancerContext ctx) {
+        ServiceInfo serviceInfo = getServiceInfoFromCache(ctx);
+        if (serviceInfo != null) {
+            return serviceInfo;
+        }
         List<String> children = new ArrayList<>();
         String node = findServiceNodes(ctx, children).concat("/").concat(chooseNode(dealNodes(children)));
         byte[] bytes = ctx.getZkClient().readData(node);
         return JsonUtils.toBean(new String(bytes, CommonConstants.DEFAULT_CHARSET), ServiceInfo.class);
     }
+
+    /**
+     * 从缓存获取注册服务信息
+     *
+     * @param ctx
+     * @return
+     */
+    protected abstract ServiceInfo getServiceInfoFromCache(ZKLoadBalancerContext ctx);
 
     @Override
     public boolean hasNextServiceNode(ZKLoadBalancerContext ctx) {

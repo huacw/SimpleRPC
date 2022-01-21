@@ -28,7 +28,7 @@ public class RPCServiceCache {
     // 缓存对象
     private volatile static RPCServiceCache cache = null;
     // 上下文
-    private Map<String, Object> localContainer = new HashMap<>();
+    private Map<String, Object> localContainer = new ConcurrentHashMap<>();
     //缓存并发的锁对象
     private ReadWriteLock lock = new ReentrantReadWriteLock();
 

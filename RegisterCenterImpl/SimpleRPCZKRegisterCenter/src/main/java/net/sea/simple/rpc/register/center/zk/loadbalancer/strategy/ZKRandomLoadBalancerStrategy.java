@@ -1,6 +1,10 @@
 package net.sea.simple.rpc.register.center.zk.loadbalancer.strategy;
 
+import net.sea.simple.rpc.register.center.zk.loadbalancer.context.ZKLoadBalancerContext;
+import net.sea.simple.rpc.register.center.zk.utils.ZKUtils;
+import net.sea.simple.rpc.server.ServiceInfo;
 import net.sea.simple.rpc.utils.RPCServiceCache;
+import org.springframework.util.CollectionUtils;
 
 import java.util.HashSet;
 import java.util.List;
@@ -20,16 +24,43 @@ public class ZKRandomLoadBalancerStrategy extends AbstractZKLoadBalancerStrategy
 
 
     @Override
-    protected synchronized String chooseNode(List<String> nodes) {
+    protected synchronized ServiceInfo getServiceInfoFromCache(ZKLoadBalancerContext ctx) {
+        ServiceInfo service = ctx.getService();
+        List<ServiceInfo> serviceInfoList = ctx.getServiceRouterCache().findServiceInfo(service.getServiceName(), service.getVersion());
+        if (CollectionUtils.isEmpty(serviceInfoList)) {
+            return null;
+        }
+        return choose(serviceInfoList, (ServiceInfo node) -> ZKUtils.getServiceNameNode(node));
+    }
+
+    @FunctionalInterface
+    private interface NodeConverter<T> {
+        String convert(T t);
+    }
+
+    /**
+     * 选择节点
+     *
+     * @param nodes
+     * @param converter
+     * @param <T>
+     * @return
+     */
+    private <T> T choose(List<T> nodes, NodeConverter<T> converter) {
         RPCServiceCache rpcServiceCache = RPCServiceCache.newCache();
-        String node = nodes.get(random.nextInt(nodes.size()));
+        T node = nodes.get(random.nextInt(nodes.size()));
         Set<String> nodeSet = rpcServiceCache.getAttr(CURRENT_NODES);
         if (nodeSet == null) {
             nodeSet = new HashSet<>(16);
         }
-        nodeSet.add(node);
+        nodeSet.add(converter.convert(node));
         rpcServiceCache.putAttr(CURRENT_NODES, nodeSet);
         return node;
+    }
+
+    @Override
+    protected synchronized String chooseNode(List<String> nodes) {
+        return choose(nodes, (String node) -> node);
     }
 
     @Override
