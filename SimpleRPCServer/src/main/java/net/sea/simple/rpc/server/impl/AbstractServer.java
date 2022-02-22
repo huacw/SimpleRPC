@@ -132,7 +132,7 @@ public abstract class AbstractServer implements IRPCServer {
      */
     protected void startHeartbeat(final ServerConfig config) {
         Long heartPeriod = config.getHeartPeriod();
-        new Timer().schedule(new TimerTask() {
+        new Timer("RPC服务心跳检测").schedule(new TimerTask() {
             @Override
             public void run() {
                 //服务重新注册

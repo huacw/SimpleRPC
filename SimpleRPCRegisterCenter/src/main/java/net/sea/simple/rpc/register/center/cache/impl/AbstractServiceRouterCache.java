@@ -65,7 +65,7 @@ public abstract class AbstractServiceRouterCache implements IServiceRouterCache 
     private void startRefreshRouterTask() {
         long refreshPeriod = config.getRefreshPeriod();
         String cacheType = getCacheType();
-        new Timer().schedule(new TimerTask() {
+        new Timer("定时刷新服务路由").schedule(new TimerTask() {
             @Override
             public void run() {
                 log.info("缓存【{}】刷新所有可用服务开始", cacheType);
