@@ -49,6 +49,7 @@ public class ClientConnectionPoolManager {
         ClientConnectionPool pool = connectionMap.get(conn);
         if (pool == null) {
             synchronized (lock) {
+                pool = connectionMap.get(conn);
                 if (pool == null) {
                     conn.setClientConfig(config);
                     pool = new ClientConnectionPool(conn);
